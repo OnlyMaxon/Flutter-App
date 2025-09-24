@@ -171,12 +171,12 @@ class _ProfilePageState extends State<ProfilePage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Column(children: const [
-                Text('122',
+                Text('0',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 Text('Followers', style: TextStyle(color: Colors.grey)),
               ]),
               Column(children: const [
-                Text('67',
+                Text('0',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 Text('Following', style: TextStyle(color: Colors.grey)),
               ]),
