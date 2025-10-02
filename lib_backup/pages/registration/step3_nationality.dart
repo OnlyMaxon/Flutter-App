@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'registration_data.dart';
 
 class Step3Nationality extends StatefulWidget {

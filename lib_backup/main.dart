@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'services/user_storage.dart';
 import 'pages/auth_choice_page.dart';
 import 'pages/explore_page.dart';

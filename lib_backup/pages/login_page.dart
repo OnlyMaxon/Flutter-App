@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import '../services/user_storage.dart';
 import 'package:apps/pages/registration/registration_data.dart';
 import '../main.dart'; // чтобы перейти на MainPage

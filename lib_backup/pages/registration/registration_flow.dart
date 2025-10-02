@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:apps/services/user_storage.dart';
 
 import 'registration_data.dart';

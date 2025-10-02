@@ -1,6 +1,5 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'registration_data.dart';
-
 class Step5Interests extends StatefulWidget {
   final UserRegistrationData data;
   final VoidCallback onNext;

@@ -1,4 +1,4 @@
-﻿
+
 class UserRegistrationData {
   String? email;
   String? password;

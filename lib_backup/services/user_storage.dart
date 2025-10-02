@@ -1,4 +1,4 @@
-﻿// lib/services/user_storage.dart
+// lib/services/user_storage.dart
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
@@ -77,11 +77,11 @@ Future<void> initTestUser() async {
   final exists = users.any((u) => u.email == "test@example.com");
   if (!exists) {
     final testUser = UserRegistrationData(
-      email: "caliloruclu@icloud.com",
+      email: "test@example.com",
       password: "123456",
-      firstName: "Max",
-      lastName: "Orucov",
-      nickname: "Maxon",
+      firstName: "Test",
+      lastName: "User",
+      nickname: "TestUser",
       country: "Польша",
       nationality: "Русский", // 👈 по умолчанию
       languages: ["Русский", "Английский"],

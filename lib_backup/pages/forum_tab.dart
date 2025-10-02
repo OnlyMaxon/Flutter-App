@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'forum_chat_page.dart';
 import 'package:apps/pages/registration/registration_data.dart';
 import 'package:apps/services//user_storage.dart'; // 👈 чтобы достать Tes

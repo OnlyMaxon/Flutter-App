@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'registration/registration_flow.dart';
 import 'login_page.dart'; // подключаем страницу входа
 

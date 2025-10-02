@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'profile_pagedemo.dart';
 import 'package:apps/pages/registration/registration_data.dart';
 
