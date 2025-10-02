@@ -136,7 +136,7 @@ class _MainPageState extends State<MainPage> {
                         showAboutDialog(
                           context: context,
                           applicationName: "MeetPlace",
-                          applicationVersion: "1.0.0",
+                          applicationVersion: "5.0.0",
                           applicationLegalese: "© 2025 MeetPlace",
                         );
                       });

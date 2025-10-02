@@ -3,6 +3,7 @@ import '../services/user_storage.dart';
 import '../pages/registration/registration_data.dart';
 import 'dart:io';
 import 'package:palette_generator/palette_generator.dart';
+import 'edit_profile_page.dart'; // 👈 импортируем экран редактирования
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -53,33 +54,49 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: const Color(0xFF121212),
       body: ListView(
         children: [
-          // Верхняя часть с фоном и аватаром
+          // Верхняя часть: cover или цвет из аватарки
           Stack(
             clipBehavior: Clip.none,
             children: [
               Container(
                 height: 200,
                 width: double.infinity,
-                color: _coverColor,
+                decoration: (_user!.coverPath != null && File(_user!.coverPath!).existsSync())
+                    ? BoxDecoration(
+                  image: DecorationImage(
+                    image: FileImage(File(_user!.coverPath!)),
+                    fit: BoxFit.cover,
+                  ),
+                )
+                    : BoxDecoration(
+                  color: _coverColor, // по умолчанию цвет из аватарки
+                ),
               ),
+
+              // 👇 Кнопка Edit сверху справа
+              Positioned(
+                top: 16,
+                right: 16,
+                child: IconButton(
+                  icon: const Icon(Icons.edit, color: Colors.white),
+                  onPressed: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const EditProfilePage()),
+                    );
+                    _loadUser(); // обновляем данные после возврата
+                  },
+                ),
+              ),
+
               Positioned(
                 bottom: -50,
                 left: 16,
-                child: Container(
-                  padding: const EdgeInsets.all(3), // толщина обводки
-                  decoration: BoxDecoration(
-                    color: Colors.white, // цвет рамки
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.3),
-                        blurRadius: 6,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.white,
                   child: CircleAvatar(
-                    radius: 45,
+                    radius: 46,
                     backgroundImage: _user!.photoPath != null &&
                         File(_user!.photoPath!).existsSync()
                         ? FileImage(File(_user!.photoPath!))
@@ -94,13 +111,12 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 64),
 
-          // Имя, фамилия, ник, бейдж
+          // Имя, ник, бейдж, страна
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Имя + фамилия
                 Text(
                   '${_user!.firstName ?? ''} ${_user!.lastName ?? ''}'.trim().isEmpty
                       ? '—'
@@ -108,32 +124,87 @@ class _ProfilePageState extends State<ProfilePage> {
                   style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
+                    color: Colors.white,
                   ),
                 ),
                 const SizedBox(height: 4),
-
-                // Никнейм с @
                 Text(
                   _user!.nickname != null && _user!.nickname!.startsWith('@')
                       ? _user!.nickname!
                       : '@${_user!.nickname ?? 'username'}',
                   style: const TextStyle(color: Colors.grey),
                 ),
-
                 const SizedBox(height: 8),
 
+                // Бейдж Student
                 if (_user!.isStudent == true)
-                  Chip(
-                    label: const Text('Student'),
-                    backgroundColor: Colors.blue.shade100,
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1E88E5),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.check, size: 16, color: Colors.white),
+                        SizedBox(width: 6),
+                        Text(
+                          'Student',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
 
                 const SizedBox(height: 8),
-
-                Text(
-                  '${_user!.country ?? '—'}, ${_user!.nationality ?? '—'}',
-                  style: const TextStyle(fontSize: 14, color: Colors.white70),
+                Row(
+                  children: [
+                    if (_user!.country != null && _user!.country!.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        margin: const EdgeInsets.only(right: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple.shade700,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.flag, size: 16, color: Colors.white),
+                            const SizedBox(width: 6),
+                            Text(
+                              _user!.country!,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    if (_user!.nationality != null && _user!.nationality!.isNotEmpty)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.indigo.shade700,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.public, size: 16, color: Colors.white),
+                            const SizedBox(width: 6),
+                            Text(
+                              _user!.nationality!,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
                 ),
+
               ],
             ),
           ),
@@ -144,11 +215,30 @@ class _ProfilePageState extends State<ProfilePage> {
           if (_user!.interests.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Wrap(
-                spacing: 8,
-                children: _user!.interests
-                    .map((i) => Chip(label: Text('#$i')))
-                    .toList(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Интересы",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: _user!.interests
+                        .map((i) => Chip(
+                      avatar: const Icon(Icons.tag, size: 16, color: Colors.white),
+                      label: Text(i.startsWith('#') ? i : '#$i'),
+                      backgroundColor: Colors.blueGrey.shade700,
+                      labelStyle: const TextStyle(color: Colors.white),
+                    ))
+                        .toList(),
+                  ),
+                ],
               ),
             ),
 
@@ -156,28 +246,47 @@ class _ProfilePageState extends State<ProfilePage> {
           if (_user!.languages.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Wrap(
-                spacing: 8,
-                children: _user!.languages
-                    .map((l) => Chip(label: Text(l)))
-                    .toList(),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Языки",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    children: _user!.languages
+                        .map((l) => Chip(
+                      avatar: const Icon(Icons.language, size: 16, color: Colors.white),
+                      label: Text(l),
+                      backgroundColor: Colors.teal.shade700,
+                      labelStyle: const TextStyle(color: Colors.white),
+                    ))
+                        .toList(),
+                  ),
+                ],
               ),
             ),
 
           const SizedBox(height: 16),
 
-          // Статистика
+          // Followers / Following
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Column(children: const [
-                Text('0',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text('122',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                 Text('Followers', style: TextStyle(color: Colors.grey)),
               ]),
               Column(children: const [
-                Text('0',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text('67',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                 Text('Following', style: TextStyle(color: Colors.grey)),
               ]),
             ],
@@ -185,15 +294,27 @@ class _ProfilePageState extends State<ProfilePage> {
 
           const SizedBox(height: 16),
 
-          // Кнопки
+          // Кнопки действий (без Edit)
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ElevatedButton(onPressed: () {}, child: const Text('Text')),
-                ElevatedButton(onPressed: () {}, child: const Text('Subscribe')),
-                ElevatedButton(onPressed: () {}, child: const Text('Edit')),
+                OutlinedButton(
+                  onPressed: () {},
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    side: const BorderSide(color: Colors.white),
+                  ),
+                  child: const Text('Text'),
+                ),
+                ElevatedButton(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                  ),
+                  child: const Text('Subscribe'),
+                ),
               ],
             ),
           ),

@@ -1,8 +1,9 @@
 class UserRegistrationData {
   String? email;
   String? password;
-  String? photoPath;
-  String? nationality;
+  String? photoPath;     // аватар
+  String? coverPath;     // обложка
+  String? nationality;   // национальность
   List<String> languages;
   List<String> interests;
   bool? isStudent;
@@ -12,12 +13,14 @@ class UserRegistrationData {
   String? firstName; // имя
   String? lastName;  // фамилия
 
+  DateTime? lastNationalityChange; // 👈 дата последнего изменения национальности
   bool isLoggedIn;
 
   UserRegistrationData({
     this.email,
     this.password,
     this.photoPath,
+    this.coverPath,
     this.nationality,
     List<String>? languages,
     List<String>? interests,
@@ -27,6 +30,7 @@ class UserRegistrationData {
     this.country,
     this.firstName,
     this.lastName,
+    this.lastNationalityChange,
     this.isLoggedIn = true,
   })  : languages = languages ?? [],
         interests = interests ?? [];
@@ -35,6 +39,7 @@ class UserRegistrationData {
     "email": email,
     "password": password,
     "photoPath": photoPath,
+    "coverPath": coverPath,
     "nationality": nationality,
     "languages": languages,
     "interests": interests,
@@ -44,6 +49,7 @@ class UserRegistrationData {
     "country": country,
     "firstName": firstName,
     "lastName": lastName,
+    "lastNationalityChange": lastNationalityChange?.toIso8601String(),
     "isLoggedIn": isLoggedIn,
   };
 
@@ -52,6 +58,7 @@ class UserRegistrationData {
       email: json["email"] as String?,
       password: json["password"] as String?,
       photoPath: json["photoPath"] as String?,
+      coverPath: json["coverPath"] as String?,
       nationality: json["nationality"] as String?,
       languages: (json["languages"] as List?)?.cast<String>() ?? [],
       interests: (json["interests"] as List?)?.cast<String>() ?? [],
@@ -61,6 +68,9 @@ class UserRegistrationData {
       country: json["country"] as String?,
       firstName: json["firstName"] as String?,
       lastName: json["lastName"] as String?,
+      lastNationalityChange: json["lastNationalityChange"] != null
+          ? DateTime.tryParse(json["lastNationalityChange"])
+          : null,
       isLoggedIn: json["isLoggedIn"] ?? false,
     );
   }
