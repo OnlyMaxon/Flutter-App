@@ -1,87 +1,105 @@
 import 'package:flutter/material.dart';
+import 'package:apps/services/user_storage.dart';
+import 'chat_page.dart';
+import 'registration/registration_data.dart';
+import 'forum_tab.dart';
 
-class CommunitiesPage extends StatelessWidget {
+
+class CommunitiesPage extends StatefulWidget {
   const CommunitiesPage({super.key});
+
+  @override
+  State<CommunitiesPage> createState() => _CommunitiesPageState();
+}
+
+class _CommunitiesPageState extends State<CommunitiesPage> {
+  List<UserRegistrationData> chatUsers = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadChats();
+  }
+
+  Future<void> _loadChats() async {
+    final users = await loadUsers();
+    final current = await loadCurrentUser();
+    setState(() {
+      chatUsers = users.where((u) => u.email != current?.email).toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Communities"),
-          bottom: const TabBar(
-            tabs: [
-              Tab(icon: Icon(Icons.chat_bubble_outline), text: "Чаты"),
-              Tab(icon: Icon(Icons.forum_outlined), text: "Форум"),
-            ],
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(kToolbarHeight),
+          child: AppBar(
+            automaticallyImplyLeading: false,
+            backgroundColor: const Color(0xFF121212),
+            elevation: 0,
+            title: const TabBar(
+              tabs: [
+                Tab(icon: Icon(Icons.chat_bubble_outline), text: "Чаты"),
+                Tab(icon: Icon(Icons.forum_outlined), text: "Форум"),
+              ],
+            ),
+            centerTitle: true,
           ),
         ),
-        body: const TabBarView(
+        body: TabBarView(
           children: [
-            ChatsTab(),
-            ForumTab(),
+            // 👇 Вкладка "Чаты"
+            ListView.builder(
+              itemCount: chatUsers.length,
+              itemBuilder: (context, index) {
+                final user = chatUsers[index];
+                return ListTile(
+                  leading: CircleAvatar(
+                    child: Text(
+                      user.nickname?.isNotEmpty == true
+                          ? user.nickname![0].toUpperCase()
+                          : "?",
+                    ),
+                  ),
+                  title: Text(user.nickname ?? "Без имени"),
+                  subtitle: const Text("Привет! Это тестовое сообщение 👋"),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChatPage(otherUser: user),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+
+            // 👇 Вкладка "Форум" — теперь подключаем твой ForumTab
+            const ForumTab(),
           ],
         ),
+
+
         floatingActionButton: FloatingActionButton(
+          heroTag: "communitiesFab", // 👈 уникальный тег
           onPressed: () {
-            // Действие при нажатии (например, создать чат/сообщество или открыть поиск)
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Нажата кнопка связи")),
             );
           },
-          child: const Icon(Icons.hub), // 👈 иконка "связь"
+          child: const Icon(Icons.hub),
         ),
+
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         bottomNavigationBar: BottomAppBar(
           shape: const CircularNotchedRectangle(),
           notchMargin: 6,
-          child: SizedBox(height: 50), // фон под FAB
+          child: const SizedBox(height: 50),
         ),
-      ),
-    );
-  }
-}
-
-// 👇 Вкладка "Чаты"
-class ChatsTab extends StatelessWidget {
-  const ChatsTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      children: const [
-        ListTile(
-          leading: CircleAvatar(child: Icon(Icons.person)),
-          title: Text("Maxon, Azerbaijani"),
-          subtitle: Text("Где купить магнитные наклейки?"),
-          trailing: CircleAvatar(
-            radius: 12,
-            backgroundColor: Colors.blue,
-            child: Text("6", style: TextStyle(color: Colors.white, fontSize: 12)),
-          ),
-        ),
-        Divider(),
-        ListTile(
-          leading: CircleAvatar(child: Icon(Icons.person)),
-          title: Text("Другой чат"),
-          subtitle: Text("Последнее сообщение..."),
-        ),
-      ],
-    );
-  }
-}
-
-// 👇 Вкладка "Форум"
-class ForumTab extends StatelessWidget {
-  const ForumTab({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        "Здесь будут посты и обсуждения сообществ",
-        style: Theme.of(context).textTheme.bodyLarge,
       ),
     );
   }

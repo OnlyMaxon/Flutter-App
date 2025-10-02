@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'services/user_storage.dart';
-import 'pages/registration/registration_data.dart';
 import 'pages/auth_choice_page.dart';
 import 'pages/explore_page.dart';
 import 'pages/communities_page.dart';

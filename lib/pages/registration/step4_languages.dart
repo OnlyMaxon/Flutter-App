@@ -18,7 +18,6 @@ class Step4Languages extends StatefulWidget {
 }
 
 class _Step4LanguagesState extends State<Step4Languages> {
-  // Большой список языков
   final List<String> allLanguages = const [
     'Русский',
     'Польский',
@@ -72,6 +71,7 @@ class _Step4LanguagesState extends State<Step4Languages> {
   @override
   void initState() {
     super.initState();
+    // 👇 подтягиваем выбранные языки из RegistrationFlow
     selected = [...widget.data.languages];
     filteredLanguages = List.from(allLanguages);
 
@@ -92,6 +92,7 @@ class _Step4LanguagesState extends State<Step4Languages> {
       } else {
         selected.add(lang);
       }
+      widget.data.languages = selected; // 👈 сохраняем обратно в data
     });
   }
 
@@ -101,7 +102,6 @@ class _Step4LanguagesState extends State<Step4Languages> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          // Поле поиска
           TextField(
             controller: searchCtrl,
             decoration: const InputDecoration(
@@ -110,8 +110,6 @@ class _Step4LanguagesState extends State<Step4Languages> {
             ),
           ),
           const SizedBox(height: 12),
-
-          // Список языков с прокруткой
           Expanded(
             child: ListView.builder(
               itemCount: filteredLanguages.length,
@@ -128,8 +126,6 @@ class _Step4LanguagesState extends State<Step4Languages> {
               },
             ),
           ),
-
-          // Кнопки навигации
           Row(
             children: [
               TextButton(onPressed: widget.onBack, child: const Text('Назад')),

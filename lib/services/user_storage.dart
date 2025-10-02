@@ -1,8 +1,12 @@
-// lib/services/user_storage.dart
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:collection/collection.dart';
 import '../pages/registration/registration_data.dart';
+
+
+
+
 
 /// Получаем путь к файлу, где будут храниться данные пользователей
 Future<File> _getUsersFile() async {
@@ -22,6 +26,7 @@ Future<List<UserRegistrationData>> loadUsers() async {
   final file = await _getUsersFile();
   if (await file.exists()) {
     final contents = await file.readAsString();
+    if (contents.trim().isEmpty) return []; // 👈 защита от пустого файла
     final List<dynamic> jsonList = jsonDecode(contents);
     return jsonList.map((j) => UserRegistrationData.fromJson(j)).toList();
   }
@@ -38,27 +43,27 @@ Future<void> addUser(UserRegistrationData user) async {
 /// Загружаем текущего залогиненного пользователя
 Future<UserRegistrationData?> loadCurrentUser() async {
   final users = await loadUsers();
-  try {
-    return users.firstWhere((u) => u.isLoggedIn == true);
-  } catch (_) {
-    return null;
-  }
+  return users.firstWhereOrNull((u) => u.isLoggedIn == true);
 }
 
 /// Сохраняем/обновляем текущего пользователя
 Future<void> saveCurrentUser(UserRegistrationData user) async {
   final users = await loadUsers();
+
   // Сбрасываем флаг у всех
   for (var u in users) {
     u.isLoggedIn = false;
   }
+
   // Если юзер уже есть — обновляем, иначе добавляем
   final index = users.indexWhere((u) => u.email == user.email);
+  user.isLoggedIn = true;
   if (index != -1) {
-    users[index] = user..isLoggedIn = true;
+    users[index] = user;
   } else {
-    users.add(user..isLoggedIn = true);
+    users.add(user);
   }
+
   await saveUsers(users);
 }
 
@@ -73,16 +78,16 @@ Future<void> deleteAllUsers() async {
 /// Создаём тестового пользователя, если его ещё нет
 Future<void> initTestUser() async {
   final users = await loadUsers();
-  final exists = users.any((u) => u.email == "test@example.com");
+  final exists = users.any((u) => u.email == "test@email.com");
   if (!exists) {
     final testUser = UserRegistrationData(
-      email: "test@example.com",
+      email: "test@email.com", // 👈 синхронизировано с проверкой
       password: "123456",
-      firstName: "Test",
-      lastName: "User",
-      nickname: "TestUser",
+      firstName: "Orucov",
+      lastName: "Max",
+      nickname: "Maxon",
       country: "Польша",
-      nationality: "Русский", // 👈 по умолчанию
+      nationality: "Русский",
       languages: ["Русский", "Английский"],
       interests: ["Flutter", "UI/UX", "Стартапы"],
       isStudent: false,

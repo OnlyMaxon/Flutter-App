@@ -1,4 +1,3 @@
-// lib/pages/registration/registration_data.dart
 
 class UserRegistrationData {
   String? email;
