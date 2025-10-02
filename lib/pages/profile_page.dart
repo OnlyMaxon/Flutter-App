@@ -23,7 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadUser() async {
-    final data = await loadUserData();
+    final data = await loadCurrentUser(); // 👈 заменили
     if (data != null && data.photoPath != null && File(data.photoPath!).existsSync()) {
       final dominant = await _getDominantColor(data.photoPath!);
       setState(() {
@@ -34,6 +34,7 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() => _user = data);
     }
   }
+
 
   Future<Color> _getDominantColor(String imagePath) async {
     final palette = await PaletteGenerator.fromImageProvider(

@@ -1,3 +1,5 @@
+// lib/pages/registration/registration_data.dart
+
 class UserRegistrationData {
   String? email;
   String? password;
@@ -14,7 +16,7 @@ class UserRegistrationData {
   String? lastName;  // фамилия
 
   DateTime? lastNationalityChange; // 👈 дата последнего изменения национальности
-  bool isLoggedIn;
+  bool isLoggedIn; // 👈 флаг текущего залогиненного пользователя
 
   UserRegistrationData({
     this.email,
@@ -31,10 +33,11 @@ class UserRegistrationData {
     this.firstName,
     this.lastName,
     this.lastNationalityChange,
-    this.isLoggedIn = true,
+    this.isLoggedIn = false, // 👈 по умолчанию никто не залогинен
   })  : languages = languages ?? [],
         interests = interests ?? [];
 
+  /// Сериализация в JSON
   Map<String, dynamic> toJson() => {
     "email": email,
     "password": password,
@@ -53,6 +56,7 @@ class UserRegistrationData {
     "isLoggedIn": isLoggedIn,
   };
 
+  /// Десериализация из JSON
   static UserRegistrationData fromJson(Map<String, dynamic> json) {
     return UserRegistrationData(
       email: json["email"] as String?,

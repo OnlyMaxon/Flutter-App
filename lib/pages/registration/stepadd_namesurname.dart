@@ -34,13 +34,15 @@ class _StepAddNameSurnameState extends State<StepAddNameSurname> {
     widget.data.firstName = _firstNameController.text.trim();
     widget.data.lastName = _lastNameController.text.trim();
 
-    await saveUserData(widget.data);
+    // 👇 сохраняем как текущего пользователя (обновляем список)
+    await saveCurrentUser(widget.data);
 
     if (!mounted) return;
     setState(() => _saving = false);
 
     widget.onNext();
   }
+
 
   @override
   Widget build(BuildContext context) {

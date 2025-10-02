@@ -57,13 +57,20 @@ class _RegistrationFlowState extends State<RegistrationFlow> {
   }
 
   Future<void> _finish() async {
-    await saveUserData(data);
+    // Добавляем нового пользователя в список
+    await addUser(data);
+
+    // Делаем его текущим активным
+    data.isLoggedIn = true;
+    await saveCurrentUser(data);
+
     if (!mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const MainPage()),
           (route) => false,
     );
   }
+
 
   void onNationalityChanged(String nationality) {
     data.nationality = nationality;

@@ -16,26 +16,33 @@ class _LoginPageState extends State<LoginPage> {
   String? _error;
 
   Future<void> _login() async {
-    final data = await loadUserData();
-    if (data == null) {
+    final users = await loadUsers(); // 👈 загружаем всех пользователей
+
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    // Ищем пользователя по email и паролю
+    final user = users.firstWhere(
+          (u) => u.email == email && u.password == password,
+      orElse: () => UserRegistrationData(),
+    );
+
+    if (user.email == null) {
       setState(() => _error = "Пользователь не найден. Зарегистрируйтесь.");
       return;
     }
 
-    if (data.email == _emailController.text.trim() &&
-        data.password == _passwordController.text.trim()) {
-      data.isLoggedIn = true;
-      await saveUserData(data);
+    // Авторизация успешна → делаем его активным
+    user.isLoggedIn = true;
+    await saveCurrentUser(user);
 
-      if (!mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const MainPage()),
-            (route) => false,
-      );
-    } else {
-      setState(() => _error = "Неверный email или пароль");
-    }
+    if (!mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const MainPage()),
+          (route) => false,
+    );
   }
+
 
   @override
   Widget build(BuildContext context) {

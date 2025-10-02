@@ -110,7 +110,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _loadUser() async {
-    final user = await loadUserData();
+    final user = await loadCurrentUser(); // 👈 заменили на новый метод
     if (user != null) {
       setState(() {
         firstNameCtrl.text = user.firstName ?? "";
@@ -128,6 +128,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
   }
 
+
   Future<void> _pickImage(bool isCover) async {
     final picker = ImagePicker();
     final picked = await picker.pickImage(source: ImageSource.gallery);
@@ -143,7 +144,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _save() async {
-    final oldUser = await loadUserData();
+    final oldUser = await loadCurrentUser(); // 👈 заменили
 
     // Ограничение смены национальности
     if (oldUser?.lastNationalityChange != null &&
@@ -176,9 +177,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
       isLoggedIn: true,
     );
 
-    await saveUserData(user);
+    await saveCurrentUser(user); // 👈 заменили
     if (mounted) Navigator.pop(context);
   }
+
 
   Future<String?> _showInputDialog(String title) async {
     String value = "";
