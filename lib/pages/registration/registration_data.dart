@@ -77,7 +77,7 @@
     );
   }
 
-  /// Удобное копирование с изменением отдельных полей
+  /// Удобное копирование с изменением отдельных полей FOR MAIN DART !!!!!!!!
   UserRegistrationData copyWith({
     String? email,
     String? password,
