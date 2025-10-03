@@ -1,16 +1,14 @@
 ﻿import 'package:flutter/material.dart';
-import '../../services/user_storage.dart';
-import 'registration_data.dart';
-
+import 'package:apps/services/registration_draft.dart'; // 👈 теперь используем draft
 
 class StepAddNameSurname extends StatefulWidget {
-  final UserRegistrationData data;
+  final RegistrationDraft draft;
   final VoidCallback onNext;
   final VoidCallback onBack;
 
   const StepAddNameSurname({
     super.key,
-    required this.data,
+    required this.draft,
     required this.onNext,
     required this.onBack,
   });
@@ -21,66 +19,62 @@ class StepAddNameSurname extends StatefulWidget {
 
 class _StepAddNameSurnameState extends State<StepAddNameSurname> {
   final _formKey = GlobalKey<FormState>();
-  final _firstNameController = TextEditingController();
-  final _lastNameController = TextEditingController();
+  final _firstNameCtrl = TextEditingController();
+  final _lastNameCtrl = TextEditingController();
 
-  bool _saving = false;
-
-  Future<void> _saveAndContinue() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => _saving = true);
-
-    widget.data.firstName = _firstNameController.text.trim();
-    widget.data.lastName = _lastNameController.text.trim();
-
-    // 👇 сохраняем как текущего пользователя (обновляем список)
-    await saveCurrentUser(widget.data);
-
-    if (!mounted) return;
-    setState(() => _saving = false);
-
-    widget.onNext();
+  @override
+  void initState() {
+    super.initState();
+    _firstNameCtrl.text = widget.draft.firstName ?? '';
+    _lastNameCtrl.text = widget.draft.lastName ?? '';
   }
-
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _firstNameController,
-                decoration: const InputDecoration(
-                  labelText: "Имя",
-                  border: OutlineInputBorder(),
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            TextFormField(
+              controller: _firstNameCtrl,
+              decoration: const InputDecoration(labelText: 'Имя'),
+              validator: (v) {
+                if (v == null || v.isEmpty) return 'Введите имя';
+                return null;
+              },
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _lastNameCtrl,
+              decoration: const InputDecoration(labelText: 'Фамилия'),
+              validator: (v) {
+                if (v == null || v.isEmpty) return 'Введите фамилию';
+                return null;
+              },
+            ),
+            const Spacer(),
+            Row(
+              children: [
+                TextButton(
+                  onPressed: widget.onBack,
+                  child: const Text('Назад'),
                 ),
-                validator: (value) =>
-                value == null || value.isEmpty ? "Введите имя" : null,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _lastNameController,
-                decoration: const InputDecoration(
-                  labelText: "Фамилия",
-                  border: OutlineInputBorder(),
+                const Spacer(),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      widget.draft.firstName = _firstNameCtrl.text.trim();
+                      widget.draft.lastName = _lastNameCtrl.text.trim();
+                      widget.onNext();
+                    }
+                  },
+                  child: const Text('Далее'),
                 ),
-                validator: (value) =>
-                value == null || value.isEmpty ? "Введите фамилию" : null,
-              ),
-              const SizedBox(height: 24),
-              _saving
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                onPressed: _saveAndContinue,
-                child: const Text("Далее"),
-              ),
-            ],
-          ),
+              ],
+            ),
+          ],
         ),
       ),
     );

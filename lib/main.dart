@@ -8,7 +8,6 @@ import 'pages/create_post_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initTestUser(); // 👈 создаём тестового пользователя, если его нет
   runApp(const MeetPlaceApp());
 }
 
@@ -49,9 +48,9 @@ class _StartupPageState extends State<StartupPage> {
   }
 
   Future<void> _checkRegistration() async {
-    final currentUser = await loadCurrentUser(); // 👈 берём активного юзера
+    final currentUser = await loadCurrentUser();
     _registered = currentUser != null &&
-        (currentUser.email?.isNotEmpty ?? false) &&
+        currentUser.email.isNotEmpty &&   // email теперь всегда required
         currentUser.isLoggedIn;
     setState(() => _loading = false);
   }
@@ -99,12 +98,10 @@ class _MainPageState extends State<MainPage> {
           highlightColor: Colors.transparent,
           onTap: () async {
             if (label == "More") {
-              // Подсветка кнопки
               setStateSB(() => isHighlighted = true);
               await Future.delayed(const Duration(milliseconds: 200));
               setStateSB(() => isHighlighted = false);
 
-              // Позиция кнопки More
               final RenderBox renderBox = context.findRenderObject() as RenderBox;
               final Offset offset = renderBox.localToGlobal(Offset.zero);
               final Size size = renderBox.size;
@@ -156,8 +153,8 @@ class _MainPageState extends State<MainPage> {
                     onTap: () async {
                       final currentUser = await loadCurrentUser();
                       if (currentUser != null) {
-                        currentUser.isLoggedIn = false;
-                        await saveCurrentUser(currentUser); // 👈 обновляем список
+                        final updated = currentUser.copyWith(isLoggedIn: false);
+                        await saveCurrentUser(updated);
                       }
                       Future.delayed(Duration.zero, () {
                         Navigator.of(context).pushAndRemoveUntil(

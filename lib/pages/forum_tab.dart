@@ -1,8 +1,10 @@
-﻿import 'package:flutter/material.dart';
+﻿
+// ЕСТЬ ЗАГЛУШКИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+import 'package:flutter/material.dart';
 import 'forum_chat_page.dart';
 import 'package:apps/pages/registration/registration_data.dart';
-import 'package:apps/services//user_storage.dart'; // 👈 чтобы достать Tes
-// tUser
+import 'package:apps/services/user_storage.dart';
 
 class ForumTab extends StatefulWidget {
   const ForumTab({super.key});
@@ -29,21 +31,40 @@ class _ForumTabState extends State<ForumTab> {
     });
   }
 
+  UserRegistrationData _findAuthor(String nickname) {
+    return users.firstWhere(
+          (u) => u.nickname == nickname,
+      orElse: () => UserRegistrationData(
+        email: "unknown@example.com",
+        password: "",
+        firstName: "Unknown",
+        lastName: "",
+        nickname: "Unknown",
+        country: "",
+        nationality: "",
+        languages: [],
+        interests: [],
+        isStudent: false,
+        isLoggedIn: false,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (loading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // 👇 демо-посты, но теперь авторы — реальные объекты
+    // 👇 демо-посты, теперь автор ищется безопасно
     final forumPosts = [
       {
-        "author": users.firstWhere((u) => u.nickname == "TestUser"),
+        "author": _findAuthor("Maxon"), // например твой тестовый ник
         "question": "Где купить магнитные наклейки?",
         "tag": "#taxi@Vistula",
       },
       {
-        "author": users.firstWhere((u) => u.nickname == "TestUser"),
+        "author": _findAuthor("Maxon"),
         "question": "Кто идёт на встречу в субботу?",
         "tag": "#meetup",
       },

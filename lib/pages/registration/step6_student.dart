@@ -1,14 +1,14 @@
 ﻿import 'package:flutter/material.dart';
-import 'registration_data.dart';
+import 'package:apps/services/registration_draft.dart'; // 👈 теперь используем draft
 
 class Step6Student extends StatefulWidget {
-  final UserRegistrationData data;
+  final RegistrationDraft draft;
   final VoidCallback onNext;
   final VoidCallback onBack;
 
   const Step6Student({
     super.key,
-    required this.data,
+    required this.draft,
     required this.onNext,
     required this.onBack,
   });
@@ -23,7 +23,7 @@ class _Step6StudentState extends State<Step6Student> {
   @override
   void initState() {
     super.initState();
-    isStudent = widget.data.isStudent;
+    isStudent = widget.draft.isStudent;
   }
 
   @override
@@ -53,7 +53,7 @@ class _Step6StudentState extends State<Step6Student> {
                 onPressed: isStudent == null
                     ? null
                     : () {
-                  widget.data.isStudent = isStudent;
+                  widget.draft.isStudent = isStudent!; // 👈 сохраняем в draft
                   widget.onNext();
                 },
                 child: const Text('Далее'),

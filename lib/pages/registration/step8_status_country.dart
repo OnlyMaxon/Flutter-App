@@ -1,16 +1,16 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'registration_data.dart';
+import 'package:apps/services/registration_draft.dart'; // 👈 теперь используем draft
 
 class Step8StatusCountry extends StatefulWidget {
-  final UserRegistrationData data;
+  final RegistrationDraft draft;
   final VoidCallback onNext;
   final VoidCallback onBack;
 
   const Step8StatusCountry({
     super.key,
-    required this.data,
+    required this.draft,
     required this.onNext,
     required this.onBack,
   });
@@ -36,7 +36,7 @@ class _Step8StatusCountryState extends State<Step8StatusCountry> {
   @override
   void initState() {
     super.initState();
-    selectedCountry = widget.data.country;
+    selectedCountry = widget.draft.country;
     _autoFillCountry();
   }
 
@@ -82,7 +82,7 @@ class _Step8StatusCountryState extends State<Step8StatusCountry> {
       if (!mounted) return;
       setState(() {
         selectedCountry = c;
-        widget.data.country = c;
+        widget.draft.country = c; // 👈 сохраняем в draft
       });
     } catch (e) {
       if (!mounted) return;
@@ -111,7 +111,7 @@ class _Step8StatusCountryState extends State<Step8StatusCountry> {
             onChanged: (value) {
               setState(() {
                 selectedCountry = value;
-                widget.data.country = value;
+                widget.draft.country = value; // 👈 сохраняем в draft
               });
             },
           ),

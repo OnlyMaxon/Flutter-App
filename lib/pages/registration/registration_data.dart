@@ -1,25 +1,24 @@
-﻿
-class UserRegistrationData {
-  String? email;
-  String? password;
-  String? photoPath;     // аватар
-  String? coverPath;     // обложка
-  String? nationality;   // национальность
-  List<String> languages;
-  List<String> interests;
-  bool? isStudent;
-  String? nickname;
-  String? status;
-  String? country;
-  String? firstName; // имя
-  String? lastName;  // фамилия
+﻿class UserRegistrationData {
+  final String email;      // 👈 обязательный
+  final String password;   // 👈 обязательный
 
-  DateTime? lastNationalityChange; // 👈 дата последнего изменения национальности
-  bool isLoggedIn; // 👈 флаг текущего залогиненного пользователя
+  final String? photoPath;       // аватар
+  final String? coverPath;       // обложка
+  final String? nationality;     // национальность
+  final List<String> languages;
+  final List<String> interests;
+  final bool? isStudent;
+  final String? nickname;
+  final String? status;
+  final String? country;
+  final String? firstName;       // имя
+  final String? lastName;        // фамилия
+  final DateTime? lastNationalityChange; // дата последнего изменения национальности
+  final bool isLoggedIn;                 // флаг текущего залогиненного пользователя
 
   UserRegistrationData({
-    this.email,
-    this.password,
+    required this.email,
+    required this.password,
     this.photoPath,
     this.coverPath,
     this.nationality,
@@ -32,7 +31,7 @@ class UserRegistrationData {
     this.firstName,
     this.lastName,
     this.lastNationalityChange,
-    this.isLoggedIn = false, // 👈 по умолчанию никто не залогинен
+    this.isLoggedIn = false,
   })  : languages = languages ?? [],
         interests = interests ?? [];
 
@@ -56,25 +55,78 @@ class UserRegistrationData {
   };
 
   /// Десериализация из JSON
-  static UserRegistrationData fromJson(Map<String, dynamic> json) {
+  factory UserRegistrationData.fromJson(Map<String, dynamic> json) {
     return UserRegistrationData(
-      email: json["email"] as String?,
-      password: json["password"] as String?,
-      photoPath: json["photoPath"] as String?,
-      coverPath: json["coverPath"] as String?,
-      nationality: json["nationality"] as String?,
+      email: json["email"] ?? "",
+      password: json["password"] ?? "",
+      photoPath: json["photoPath"],
+      coverPath: json["coverPath"],
+      nationality: json["nationality"],
       languages: (json["languages"] as List?)?.cast<String>() ?? [],
       interests: (json["interests"] as List?)?.cast<String>() ?? [],
-      isStudent: json["isStudent"] as bool?,
-      nickname: json["nickname"] as String?,
-      status: json["status"] as String?,
-      country: json["country"] as String?,
-      firstName: json["firstName"] as String?,
-      lastName: json["lastName"] as String?,
+      isStudent: json["isStudent"],
+      nickname: json["nickname"],
+      status: json["status"],
+      country: json["country"],
+      firstName: json["firstName"],
+      lastName: json["lastName"],
       lastNationalityChange: json["lastNationalityChange"] != null
           ? DateTime.tryParse(json["lastNationalityChange"])
           : null,
       isLoggedIn: json["isLoggedIn"] ?? false,
     );
   }
+
+  /// Удобное копирование с изменением отдельных полей
+  UserRegistrationData copyWith({
+    String? email,
+    String? password,
+    String? photoPath,
+    String? coverPath,
+    String? nationality,
+    List<String>? languages,
+    List<String>? interests,
+    bool? isStudent,
+    String? nickname,
+    String? status,
+    String? country,
+    String? firstName,
+    String? lastName,
+    DateTime? lastNationalityChange,
+    bool? isLoggedIn,
+  }) {
+    return UserRegistrationData(
+      email: email ?? this.email,
+      password: password ?? this.password,
+      photoPath: photoPath ?? this.photoPath,
+      coverPath: coverPath ?? this.coverPath,
+      nationality: nationality ?? this.nationality,
+      languages: languages ?? this.languages,
+      interests: interests ?? this.interests,
+      isStudent: isStudent ?? this.isStudent,
+      nickname: nickname ?? this.nickname,
+      status: status ?? this.status,
+      country: country ?? this.country,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      lastNationalityChange: lastNationalityChange ?? this.lastNationalityChange,
+      isLoggedIn: isLoggedIn ?? this.isLoggedIn,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'UserRegistrationData(email: $email, nickname: $nickname, isLoggedIn: $isLoggedIn)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is UserRegistrationData &&
+        other.email == email &&
+        other.password == password;
+  }
+
+  @override
+  int get hashCode => email.hashCode ^ password.hashCode;
 }

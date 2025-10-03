@@ -1,14 +1,14 @@
 ﻿import 'package:flutter/material.dart';
-import 'registration_data.dart';
+import 'package:apps/services/registration_draft.dart'; // 👈 теперь используем draft
 
 class Step7Nickname extends StatefulWidget {
-  final UserRegistrationData data;
+  final RegistrationDraft draft;
   final VoidCallback onNext;
   final VoidCallback onBack;
 
   const Step7Nickname({
     super.key,
-    required this.data,
+    required this.draft,
     required this.onNext,
     required this.onBack,
   });
@@ -24,7 +24,7 @@ class _Step7NicknameState extends State<Step7Nickname> {
   @override
   void initState() {
     super.initState();
-    _nick.text = widget.data.nickname ?? '';
+    _nick.text = widget.draft.nickname ?? '';
   }
 
   @override
@@ -56,7 +56,7 @@ class _Step7NicknameState extends State<Step7Nickname> {
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      widget.data.nickname = _nick.text.trim();
+                      widget.draft.nickname = _nick.text.trim(); // 👈 сохраняем в draft
                       widget.onNext();
                     }
                   },

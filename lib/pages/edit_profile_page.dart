@@ -161,6 +161,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
     }
 
     final user = UserRegistrationData(
+      email: oldUser!.email,          // 👈 обязательное поле
+      password: oldUser.password,     // 👈 обязательное поле
       firstName: firstNameCtrl.text,
       lastName: lastNameCtrl.text,
       nickname: nicknameCtrl.text,
@@ -169,13 +171,14 @@ class _EditProfilePageState extends State<EditProfilePage> {
       languages: languages,
       photoPath: photoPath,
       coverPath: coverPath,
-      country: selectedCountry ?? oldUser?.country,
-      nationality: selectedNationality ?? oldUser?.nationality,
-      lastNationalityChange: (selectedNationality != oldUser?.nationality)
+      country: selectedCountry ?? oldUser.country,
+      nationality: selectedNationality ?? oldUser.nationality,
+      lastNationalityChange: (selectedNationality != oldUser.nationality)
           ? DateTime.now()
-          : oldUser?.lastNationalityChange,
+          : oldUser.lastNationalityChange,
       isLoggedIn: true,
     );
+
 
     await saveCurrentUser(user); // 👈 заменили
     if (mounted) Navigator.pop(context);

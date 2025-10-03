@@ -1,14 +1,14 @@
 ﻿import 'package:flutter/material.dart';
-import 'registration_data.dart';
+import 'package:apps/services/registration_draft.dart'; // 👈 теперь используем draft
 
 class Step5Interests extends StatefulWidget {
-  final UserRegistrationData data;
+  final RegistrationDraft draft;
   final VoidCallback onNext;
   final VoidCallback onBack;
 
   const Step5Interests({
     super.key,
-    required this.data,
+    required this.draft,
     required this.onNext,
     required this.onBack,
   });
@@ -25,7 +25,8 @@ class _Step5InterestsState extends State<Step5Interests> {
   @override
   void initState() {
     super.initState();
-    selected = [...widget.data.interests];
+    // 👇 подтягиваем интересы из draft
+    selected = [...widget.draft.interests];
   }
 
   void toggle(String tag) {
@@ -88,7 +89,8 @@ class _Step5InterestsState extends State<Step5Interests> {
               const Spacer(),
               ElevatedButton(
                 onPressed: () {
-                  widget.data.interests = selected;
+                  // 👇 сохраняем выбранные интересы в draft
+                  widget.draft.interests = selected;
                   widget.onNext();
                 },
                 child: const Text('Далее'),

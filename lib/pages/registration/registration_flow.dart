@@ -1,5 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:apps/services/user_storage.dart';
+import 'package:apps/services/registration_draft.dart'; // 👈 новый импорт
 
 import 'registration_data.dart';
 import 'step1_email_password.dart';
@@ -23,7 +24,9 @@ class RegistrationFlow extends StatefulWidget {
 
 class _RegistrationFlowState extends State<RegistrationFlow> {
   final PageController _controller = PageController();
-  final UserRegistrationData data = UserRegistrationData();
+
+  // 👇 теперь используем черновик
+  final RegistrationDraft draft = RegistrationDraft();
 
   int current = 0;
 
@@ -50,9 +53,29 @@ class _RegistrationFlowState extends State<RegistrationFlow> {
   }
 
   Future<void> _finish() async {
-    await addUser(data);
-    data.isLoggedIn = true;
-    await saveCurrentUser(data);
+    // 👇 собираем финального пользователя из draft
+    final user = UserRegistrationData(
+      email: draft.email,
+      password: draft.password,
+      photoPath: draft.photoPath,
+      coverPath: draft.coverPath,
+      nationality: draft.nationality,
+      languages: draft.languages,
+      interests: draft.interests,
+      isStudent: draft.isStudent,
+      nickname: draft.nickname,
+      status: draft.status,
+      country: draft.country,
+      firstName: draft.firstName,
+      lastName: draft.lastName,
+      isLoggedIn: true,
+    );
+
+    // сохраняем в список пользователей (если новый)
+    await addUser(user);
+
+    // сохраняем как текущего
+    await saveCurrentUser(user);
 
     if (!mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
@@ -62,7 +85,7 @@ class _RegistrationFlowState extends State<RegistrationFlow> {
   }
 
   void onNationalityChanged(String nationality) {
-    data.nationality = nationality;
+    draft.nationality = nationality;
 
     final Map<String, List<String>> defaultLanguagesByNationality = {
       'Русский': ['Русский', 'Английский'],
@@ -78,21 +101,21 @@ class _RegistrationFlowState extends State<RegistrationFlow> {
     };
 
     final suggested = defaultLanguagesByNationality[nationality];
-    data.languages = suggested ?? [];
+    draft.languages = suggested ?? [];
 
     setState(() {});
   }
 
   late final List<Widget> steps = [
-    Step1EmailPassword(data: data, onNext: next),
-    StepAddNameSurname(data: data, onNext: next, onBack: back),
-    Step2Photo(data: data, onSkip: next, onNext: next),
-    Step3Nationality(data: data, onChanged: onNationalityChanged, onNext: next, onBack: back),
-    Step4Languages(data: data, onNext: next, onBack: back),
-    Step5Interests(data: data, onNext: next, onBack: back),
-    Step6Student(data: data, onNext: next, onBack: back),
-    Step7Nickname(data: data, onNext: next, onBack: back),
-    Step8StatusCountry(data: data, onNext: next, onBack: back),
+    Step1EmailPassword(draft: draft, onNext: next),
+    StepAddNameSurname(draft: draft, onNext: next, onBack: back),
+    Step2Photo(draft: draft, onSkip: next, onNext: next),
+    Step3Nationality(draft: draft, onChanged: onNationalityChanged, onNext: next, onBack: back),
+    Step4Languages(draft: draft, onNext: next, onBack: back),
+    Step5Interests(draft: draft, onNext: next, onBack: back),
+    Step6Student(draft: draft, onNext: next, onBack: back),
+    Step7Nickname(draft: draft, onNext: next, onBack: back),
+    Step8StatusCountry(draft: draft, onNext: next, onBack: back),
   ];
 
   @override

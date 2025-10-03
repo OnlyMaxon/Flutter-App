@@ -1,11 +1,16 @@
 ﻿import 'package:flutter/material.dart';
-import 'registration_data.dart';
+import 'package:apps/services/registration_draft.dart';
+import 'registration_data.dart';// 👈 подключаем черновик
 
 class Step1EmailPassword extends StatefulWidget {
-  final UserRegistrationData data;
+  final RegistrationDraft draft;
   final VoidCallback onNext;
 
-  const Step1EmailPassword({super.key, required this.data, required this.onNext});
+  const Step1EmailPassword({
+    super.key,
+    required this.draft,
+    required this.onNext,
+  });
 
   @override
   State<Step1EmailPassword> createState() => _Step1EmailPasswordState();
@@ -20,8 +25,9 @@ class _Step1EmailPasswordState extends State<Step1EmailPassword> {
   @override
   void initState() {
     super.initState();
-    _email.text = widget.data.email ?? '';
-    _password.text = widget.data.password ?? '';
+    // draft всегда есть, даже если пустой
+    _email.text = widget.draft.email;
+    _password.text = widget.draft.password;
   }
 
   @override
@@ -63,8 +69,9 @@ class _Step1EmailPasswordState extends State<Step1EmailPassword> {
             ElevatedButton(
               onPressed: () {
                 if (_formKey.currentState!.validate()) {
-                  widget.data.email = _email.text.trim();
-                  widget.data.password = _password.text;
+                  // сохраняем введённые данные в draft
+                  widget.draft.email = _email.text.trim();
+                  widget.draft.password = _password.text;
                   widget.onNext();
                 }
               },

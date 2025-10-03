@@ -22,19 +22,20 @@ class _LoginPageState extends State<LoginPage> {
     final password = _passwordController.text.trim();
 
     // Ищем пользователя по email и паролю
-    final user = users.firstWhere(
-          (u) => u.email == email && u.password == password,
-      orElse: () => UserRegistrationData(),
-    );
+    final user = users.where((u) => u.email == email && u.password == password).toList();
 
-    if (user.email == null) {
-      setState(() => _error = "Пользователь не найден. Зарегистрируйтесь.");
+    if (user.isEmpty) {
+      setState(() => _error = "Пользователь не найден или пароль неверный.");
       return;
     }
 
-    // Авторизация успешна → делаем его активным
-    user.isLoggedIn = true;
-    await saveCurrentUser(user);
+    final currentUser = user.first;
+
+    // 👇 создаём новый объект с isLoggedIn = true
+    final updatedUser = currentUser.copyWith(isLoggedIn: true);
+
+    // сохраняем как текущего
+    await saveCurrentUser(updatedUser);
 
     if (!mounted) return;
     Navigator.of(context).pushAndRemoveUntil(
@@ -42,7 +43,6 @@ class _LoginPageState extends State<LoginPage> {
           (route) => false,
     );
   }
-
 
   @override
   Widget build(BuildContext context) {

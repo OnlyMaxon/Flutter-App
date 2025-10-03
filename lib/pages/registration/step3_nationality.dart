@@ -1,15 +1,15 @@
 ﻿import 'package:flutter/material.dart';
-import 'registration_data.dart';
+import 'package:apps/services/registration_draft.dart'; // 👈 теперь используем draft
 
 class Step3Nationality extends StatefulWidget {
-  final UserRegistrationData data;
+  final RegistrationDraft draft;
   final ValueChanged<String> onChanged;
   final VoidCallback onNext;
   final VoidCallback onBack;
 
   const Step3Nationality({
     super.key,
-    required this.data,
+    required this.draft,
     required this.onChanged,
     required this.onNext,
     required this.onBack,
@@ -52,7 +52,7 @@ class _Step3NationalityState extends State<Step3Nationality> {
   @override
   void initState() {
     super.initState();
-    selected = widget.data.nationality;
+    selected = widget.draft.nationality; // 👈 берём из draft
   }
 
   @override
@@ -78,7 +78,8 @@ class _Step3NationalityState extends State<Step3Nationality> {
               ElevatedButton(
                 onPressed: () {
                   if (selected == null) return;
-                  widget.onChanged(selected!); // 👈 передаём в RegistrationFlow
+                  widget.draft.nationality = selected; // 👈 сохраняем в draft
+                  widget.onChanged(selected!);          // 👈 уведомляем flow
                   widget.onNext();
                 },
                 child: const Text('Далее'),

@@ -1,15 +1,14 @@
 ﻿import 'package:flutter/material.dart';
-import 'registration_data.dart';
-
+import 'package:apps/services/registration_draft.dart'; // 👈 теперь используем draft
 
 class Step4Languages extends StatefulWidget {
-  final UserRegistrationData data;
+  final RegistrationDraft draft;
   final VoidCallback onNext;
   final VoidCallback onBack;
 
   const Step4Languages({
     super.key,
-    required this.data,
+    required this.draft,
     required this.onNext,
     required this.onBack,
   });
@@ -72,8 +71,8 @@ class _Step4LanguagesState extends State<Step4Languages> {
   @override
   void initState() {
     super.initState();
-    // 👇 подтягиваем выбранные языки из RegistrationFlow
-    selected = [...widget.data.languages];
+    // 👇 подтягиваем выбранные языки из draft
+    selected = [...widget.draft.languages];
     filteredLanguages = List.from(allLanguages);
 
     searchCtrl.addListener(() {
@@ -93,7 +92,7 @@ class _Step4LanguagesState extends State<Step4Languages> {
       } else {
         selected.add(lang);
       }
-      widget.data.languages = selected; // 👈 сохраняем обратно в data
+      widget.draft.languages = selected; // 👈 сохраняем обратно в draft
     });
   }
 
@@ -135,7 +134,7 @@ class _Step4LanguagesState extends State<Step4Languages> {
                 onPressed: selected.isEmpty
                     ? null
                     : () {
-                  widget.data.languages = selected;
+                  widget.draft.languages = selected;
                   widget.onNext();
                 },
                 child: const Text('Далее'),

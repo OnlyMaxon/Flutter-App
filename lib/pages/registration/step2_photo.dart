@@ -1,16 +1,16 @@
 ﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'registration_data.dart';
+import 'package:apps/services/registration_draft.dart'; // 👈 теперь используем draft
 
 class Step2Photo extends StatefulWidget {
-  final UserRegistrationData data;
+  final RegistrationDraft draft;
   final VoidCallback onSkip;
   final VoidCallback onNext;
 
   const Step2Photo({
     super.key,
-    required this.data,
+    required this.draft,
     required this.onSkip,
     required this.onNext,
   });
@@ -24,18 +24,21 @@ class _Step2PhotoState extends State<Step2Photo> {
 
   Future<void> _pick() async {
     final picker = ImagePicker();
-    final res = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
+    final res = await picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
     if (res != null) {
       setState(() => _file = File(res.path));
-      widget.data.photoPath = res.path;
+      widget.draft.photoPath = res.path; // 👈 сохраняем в draft
     }
   }
 
   @override
   void initState() {
     super.initState();
-    if (widget.data.photoPath != null) {
-      _file = File(widget.data.photoPath!);
+    if (widget.draft.photoPath != null) {
+      _file = File(widget.draft.photoPath!);
     }
   }
 
@@ -59,7 +62,10 @@ class _Step2PhotoState extends State<Step2Photo> {
           const Spacer(),
           Row(
             children: [
-              TextButton(onPressed: widget.onSkip, child: const Text('Пропустить')),
+              TextButton(
+                onPressed: widget.onSkip,
+                child: const Text('Пропустить'),
+              ),
               const Spacer(),
               ElevatedButton(
                 onPressed: widget.onNext,

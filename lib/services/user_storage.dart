@@ -4,11 +4,16 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:apps/pages/registration/registration_data.dart';
 
-
-/// Получаем путь к файлу, где будут храниться данные пользователей
+/// Получаем путь к файлу со всеми пользователями
 Future<File> _getUsersFile() async {
   final dir = await getApplicationDocumentsDirectory();
   return File('${dir.path}/users.json');
+}
+
+/// Получаем путь к файлу текущего пользователя
+Future<File> _getCurrentUserFile() async {
+  final dir = await getApplicationDocumentsDirectory();
+  return File('${dir.path}/current_user.json');
 }
 
 /// Сохраняем список пользователей
@@ -29,36 +34,39 @@ Future<List<UserRegistrationData>> loadUsers() async {
   return [];
 }
 
-/// Добавляем нового пользователя
+/// Добавляем нового пользователя (если email уникален)
 Future<void> addUser(UserRegistrationData user) async {
   final users = await loadUsers();
-  users.add(user);
-  await saveUsers(users);
+  final exists = users.any((u) => u.email == user.email);
+  if (!exists) {
+    users.add(user);
+    await saveUsers(users);
+  }
 }
 
 /// Загружаем текущего залогиненного пользователя
 Future<UserRegistrationData?> loadCurrentUser() async {
-  final users = await loadUsers();
-  try {
-    return users.firstWhere((u) => u.isLoggedIn == true);
-  } catch (_) {
-    return null;
+  final file = await _getCurrentUserFile();
+  if (await file.exists()) {
+    final contents = await file.readAsString();
+    return UserRegistrationData.fromJson(jsonDecode(contents));
   }
+  return null;
 }
 
 /// Сохраняем/обновляем текущего пользователя
 Future<void> saveCurrentUser(UserRegistrationData user) async {
+  // сохраняем в отдельный файл
+  final file = await _getCurrentUserFile();
+  await file.writeAsString(jsonEncode(user.toJson()));
+
+  // обновляем список пользователей
   final users = await loadUsers();
-  // Сбрасываем флаг у всех
-  for (var u in users) {
-    u.isLoggedIn = false;
-  }
-  // Если юзер уже есть — обновляем, иначе добавляем
   final index = users.indexWhere((u) => u.email == user.email);
   if (index != -1) {
-    users[index] = user..isLoggedIn = true;
+    users[index] = user;
   } else {
-    users.add(user..isLoggedIn = true);
+    users.add(user);
   }
   await saveUsers(users);
 }
@@ -69,27 +77,8 @@ Future<void> deleteAllUsers() async {
   if (await file.exists()) {
     await file.delete();
   }
-}
-
-/// Создаём тестового пользователя, если его ещё нет
-Future<void> initTestUser() async {
-  final users = await loadUsers();
-  final exists = users.any((u) => u.email == "test@example.com");
-  if (!exists) {
-    final testUser = UserRegistrationData(
-      email: "caliloruclu@icloud.com",
-      password: "123456",
-      firstName: "Max",
-      lastName: "Orucov",
-      nickname: "Maxon",
-      country: "Польша",
-      nationality: "Русский", // 👈 по умолчанию
-      languages: ["Русский", "Английский"],
-      interests: ["Flutter", "UI/UX", "Стартапы"],
-      isStudent: false,
-      isLoggedIn: false, // 👈 он не активный
-    );
-    users.add(testUser);
-    await saveUsers(users);
+  final currentFile = await _getCurrentUserFile();
+  if (await currentFile.exists()) {
+    await currentFile.delete();
   }
 }
