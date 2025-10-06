@@ -21,7 +21,7 @@ class _ChatPageState extends State<ChatPage> {
     setState(() {
       _messages.add("Я: ${_controller.text.trim()}");
       _controller.clear();
-      // 👇 имитация ответа тестового пользователя
+
       Future.delayed(const Duration(seconds: 1), () {
         setState(() {
           _messages.add("${widget.otherUser.nickname}: Я тестовый, привет 👋");
@@ -42,7 +42,7 @@ class _ChatPageState extends State<ChatPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => ProfilePageDemo(user: widget.otherUser), // 👈 заменили
+                  builder: (_) => ProfilePageDemo(user: widget.otherUser),
                 ),
               );
 

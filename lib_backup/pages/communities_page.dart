@@ -51,7 +51,7 @@ class _CommunitiesPageState extends State<CommunitiesPage> {
         ),
         body: TabBarView(
           children: [
-            // 👇 Вкладка "Чаты"
+
             ListView.builder(
               itemCount: chatUsers.length,
               itemBuilder: (context, index) {
@@ -78,14 +78,14 @@ class _CommunitiesPageState extends State<CommunitiesPage> {
               },
             ),
 
-            // 👇 Вкладка "Форум" — теперь подключаем твой ForumTab
+
             const ForumTab(),
           ],
         ),
 
 
         floatingActionButton: FloatingActionButton(
-          heroTag: "communitiesFab", // 👈 уникальный тег
+          heroTag: "communitiesFab",
           onPressed: () {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text("Нажата кнопка связи")),

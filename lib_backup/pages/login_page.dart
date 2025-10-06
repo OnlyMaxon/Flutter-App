@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/user_storage.dart';
 import 'package:apps/pages/registration/registration_data.dart';
-import '../main.dart'; // чтобы перейти на MainPage
+import '../main.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,12 +16,12 @@ class _LoginPageState extends State<LoginPage> {
   String? _error;
 
   Future<void> _login() async {
-    final users = await loadUsers(); // 👈 загружаем всех пользователей
+    final users = await loadUsers();
 
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    // Ищем пользователя по email и паролю
+
     final user = users.firstWhere(
           (u) => u.email == email && u.password == password,
       orElse: () => UserRegistrationData(),
@@ -32,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    // Авторизация успешна → делаем его активным
+
     user.isLoggedIn = true;
     await saveCurrentUser(user);
 

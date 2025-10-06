@@ -8,7 +8,7 @@ import 'pages/create_post_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initTestUser(); // 👈 создаём тестового пользователя, если его нет
+  await initTestUser();
   runApp(const MeetPlaceApp());
 }
 
@@ -49,7 +49,7 @@ class _StartupPageState extends State<StartupPage> {
   }
 
   Future<void> _checkRegistration() async {
-    final currentUser = await loadCurrentUser(); // 👈 берём активного юзера
+    final currentUser = await loadCurrentUser();
     _registered = currentUser != null &&
         (currentUser.email?.isNotEmpty ?? false) &&
         currentUser.isLoggedIn;
@@ -157,7 +157,7 @@ class _MainPageState extends State<MainPage> {
                       final currentUser = await loadCurrentUser();
                       if (currentUser != null) {
                         currentUser.isLoggedIn = false;
-                        await saveCurrentUser(currentUser); // 👈 обновляем список
+                        await saveCurrentUser(currentUser);
                       }
                       Future.delayed(Duration.zero, () {
                         Navigator.of(context).pushAndRemoveUntil(

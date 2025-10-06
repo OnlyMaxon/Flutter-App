@@ -44,7 +44,7 @@ class _Step7NicknameState extends State<Step7Nickname> {
                 if (v == null || v.isEmpty) return 'Введите никнейм';
                 if (!v.startsWith('@')) return 'Ник должен начинаться с @';
                 if (v.length < 3) return 'Слишком короткий ник';
-                // Здесь можно добавить проверку уникальности на сервере
+
                 return null;
               },
             ),

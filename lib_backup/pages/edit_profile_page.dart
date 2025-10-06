@@ -110,7 +110,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _loadUser() async {
-    final user = await loadCurrentUser(); // 👈 заменили на новый метод
+    final user = await loadCurrentUser();
     if (user != null) {
       setState(() {
         firstNameCtrl.text = user.firstName ?? "";
@@ -144,9 +144,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _save() async {
-    final oldUser = await loadCurrentUser(); // 👈 заменили
+    final oldUser = await loadCurrentUser();
 
-    // Ограничение смены национальности
+
     if (oldUser?.lastNationalityChange != null &&
         selectedNationality != oldUser?.nationality) {
       final diff = DateTime.now().difference(oldUser!.lastNationalityChange!);
@@ -177,7 +177,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       isLoggedIn: true,
     );
 
-    await saveCurrentUser(user); // 👈 заменили
+    await saveCurrentUser(user);
     if (mounted) Navigator.pop(context);
   }
 
@@ -352,7 +352,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   String _formatDate(DateTime d) {
-    // Короткий DD.MM.YYYY
+
     final day = d.day.toString().padLeft(2, '0');
     final month = d.month.toString().padLeft(2, '0');
     final year = d.year.toString();
@@ -360,7 +360,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 }
 
-// ---- Модальное окно выбора языков с поиском и улучшенным UX ----
+
 
 class LanguageSelector extends StatefulWidget {
   final List<String> selected;

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'registration/registration_flow.dart';
-import 'login_page.dart'; // подключаем страницу входа
-
+import 'login_page.dart';
 class AuthChoicePage extends StatelessWidget {
   const AuthChoicePage({super.key});
 
@@ -20,7 +19,7 @@ class AuthChoicePage extends StatelessWidget {
             ),
             const SizedBox(height: 40),
 
-            // Кнопка регистрации
+
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -36,7 +35,7 @@ class AuthChoicePage extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // Кнопка входа
+
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(

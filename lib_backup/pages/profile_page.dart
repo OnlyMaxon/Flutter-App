@@ -23,7 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadUser() async {
-    final data = await loadCurrentUser(); // 👈 заменили
+    final data = await loadCurrentUser();
     if (data != null && data.photoPath != null && File(data.photoPath!).existsSync()) {
       final dominant = await _getDominantColor(data.photoPath!);
       setState(() {
@@ -55,7 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
       backgroundColor: const Color(0xFF121212),
       body: ListView(
         children: [
-          // Верхняя часть: cover или цвет из аватарки
+
           Stack(
             clipBehavior: Clip.none,
             children: [
@@ -74,7 +74,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
 
-              // 👇 Кнопка Edit сверху справа
+
               Positioned(
                 top: 16,
                 right: 16,
@@ -112,7 +112,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
           const SizedBox(height: 64),
 
-          // Имя, ник, бейдж, страна
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Column(
@@ -137,7 +137,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(height: 8),
 
-                // Бейдж Student
+
                 if (_user!.isStudent == true)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -212,7 +212,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
           const SizedBox(height: 16),
 
-          // Интересы
+
           if (_user!.interests.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -243,7 +243,7 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
 
-          // Языки
+
           if (_user!.languages.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -276,7 +276,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
           const SizedBox(height: 16),
 
-          // Followers / Following
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -295,7 +295,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
           const SizedBox(height: 16),
 
-          // Кнопки действий (без Edit)
+
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
@@ -322,7 +322,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
           const SizedBox(height: 32),
 
-          // Плейсхолдер контента
+
           Center(
             child: Column(
               children: const [

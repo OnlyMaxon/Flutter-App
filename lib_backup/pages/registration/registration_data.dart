@@ -2,20 +2,20 @@
 class UserRegistrationData {
   String? email;
   String? password;
-  String? photoPath;     // аватар
-  String? coverPath;     // обложка
-  String? nationality;   // национальность
+  String? photoPath;
+  String? coverPath;
+  String? nationality;
   List<String> languages;
   List<String> interests;
   bool? isStudent;
   String? nickname;
   String? status;
   String? country;
-  String? firstName; // имя
-  String? lastName;  // фамилия
+  String? firstName;
+  String? lastName;
 
-  DateTime? lastNationalityChange; // 👈 дата последнего изменения национальности
-  bool isLoggedIn; // 👈 флаг текущего залогиненного пользователя
+  DateTime? lastNationalityChange;
+  bool isLoggedIn;
 
   UserRegistrationData({
     this.email,
@@ -32,11 +32,11 @@ class UserRegistrationData {
     this.firstName,
     this.lastName,
     this.lastNationalityChange,
-    this.isLoggedIn = false, // 👈 по умолчанию никто не залогинен
+    this.isLoggedIn = false,
   })  : languages = languages ?? [],
         interests = interests ?? [];
 
-  /// Сериализация в JSON
+
   Map<String, dynamic> toJson() => {
     "email": email,
     "password": password,
@@ -55,7 +55,6 @@ class UserRegistrationData {
     "isLoggedIn": isLoggedIn,
   };
 
-  /// Десериализация из JSON
   static UserRegistrationData fromJson(Map<String, dynamic> json) {
     return UserRegistrationData(
       email: json["email"] as String?,

@@ -78,7 +78,7 @@ class _Step3NationalityState extends State<Step3Nationality> {
               ElevatedButton(
                 onPressed: () {
                   if (selected == null) return;
-                  widget.onChanged(selected!); // 👈 передаём в RegistrationFlow
+                  widget.onChanged(selected!);
                   widget.onNext();
                 },
                 child: const Text('Далее'),

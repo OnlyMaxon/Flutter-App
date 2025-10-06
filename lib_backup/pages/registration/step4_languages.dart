@@ -72,7 +72,6 @@ class _Step4LanguagesState extends State<Step4Languages> {
   @override
   void initState() {
     super.initState();
-    // 👇 подтягиваем выбранные языки из RegistrationFlow
     selected = [...widget.data.languages];
     filteredLanguages = List.from(allLanguages);
 
@@ -93,7 +92,7 @@ class _Step4LanguagesState extends State<Step4Languages> {
       } else {
         selected.add(lang);
       }
-      widget.data.languages = selected; // 👈 сохраняем обратно в data
+      widget.data.languages = selected;
     });
   }
 

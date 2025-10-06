@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'profile_pagedemo.dart';
 import 'package:apps/pages/registration/registration_data.dart';
-import 'package:apps/services/user_storage.dart'; // 👈 подтягиваем сохранённых юзеров
+import 'package:apps/services/user_storage.dart';
 
 
 class ForumChatPage extends StatefulWidget {
   final String topic;
-  final String author; // сюда приходит nickname автора
+  final String author;
 
   const ForumChatPage({super.key, required this.topic, required this.author});
 
