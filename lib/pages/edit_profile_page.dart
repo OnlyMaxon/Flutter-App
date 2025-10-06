@@ -268,17 +268,18 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
           // Страна (Dropdown)
           DropdownButtonFormField<String>(
-            value: selectedCountry,
+            value: countries.contains(selectedCountry) ? selectedCountry : null,
             decoration: const InputDecoration(labelText: "Страна"),
-            items: countries.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+            items: countries.toSet().map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
             onChanged: (val) => setState(() => selectedCountry = val),
           ),
+
 
           const SizedBox(height: 16),
 
           // Национальность (Dropdown)
           DropdownButtonFormField<String>(
-            value: selectedNationality,
+            value: nationalities.contains(selectedNationality) ? selectedNationality : null,
             decoration: InputDecoration(
               labelText: "Национальность",
               helperText: lastNationalityChange == null
@@ -286,9 +287,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   : "Последнее изменение: ${_formatDate(lastNationalityChange!)}",
               helperStyle: subtitleStyle,
             ),
-            items: nationalities.map((n) => DropdownMenuItem(value: n, child: Text(n))).toList(),
+            items: nationalities.toSet().map((n) => DropdownMenuItem(value: n, child: Text(n))).toList(),
             onChanged: (val) => setState(() => selectedNationality = val),
           ),
+
 
           const SizedBox(height: 16),
 

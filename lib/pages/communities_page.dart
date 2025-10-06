@@ -3,7 +3,9 @@ import 'package:apps/services/user_storage.dart';
 import 'chat_page.dart';
 import 'package:apps/pages/registration/registration_data.dart';
 import 'forum_tab.dart';
-
+import '../services/message_storage.dart';
+import '../services/message.dart';
+import 'search_users_page.dart'; // 👈 подключаем поиск
 
 class CommunitiesPage extends StatefulWidget {
   const CommunitiesPage({super.key});
@@ -14,6 +16,9 @@ class CommunitiesPage extends StatefulWidget {
 
 class _CommunitiesPageState extends State<CommunitiesPage> {
   List<UserRegistrationData> chatUsers = [];
+  Map<String, Message> lastMessages = {}; // email -> последнее сообщение
+  UserRegistrationData? _currentUser;
+  final MessageStorage _storage = MessageStorage();
 
   @override
   void initState() {
@@ -24,9 +29,118 @@ class _CommunitiesPageState extends State<CommunitiesPage> {
   Future<void> _loadChats() async {
     final users = await loadUsers();
     final current = await loadCurrentUser();
+    final allMessages = await _storage.loadMessages();
+
+    final Map<String, Message> latest = {};
+
+    if (current != null) {
+      for (final u in users) {
+        if (u.email == current.email) continue;
+
+        // фильтруем все сообщения между current и этим пользователем
+        final msgs = allMessages.where((m) =>
+        (m.sender == current.email && m.recipient == u.email) ||
+            (m.sender == u.email && m.recipient == current.email));
+
+        if (msgs.isNotEmpty) {
+          // берём последнее по времени
+          final last = msgs.reduce((a, b) =>
+          a.timestamp.isAfter(b.timestamp) ? a : b);
+          latest[u.email] = last;
+        }
+      }
+    }
+
     setState(() {
-      chatUsers = users.where((u) => u.email != current?.email).toList();
+      _currentUser = current;
+      // 👇 теперь только те пользователи, с кем реально есть сообщения
+      chatUsers = users.where((u) => latest.containsKey(u.email)).toList();
+      lastMessages = latest;
     });
+  }
+
+  PreferredSizeWidget _buildTopBar() {
+    return AppBar(
+      automaticallyImplyLeading: false,
+      backgroundColor: const Color(0xFF121212),
+      elevation: 0,
+      title: const TabBar(
+        tabs: [
+          Tab(icon: Icon(Icons.chat_bubble_outline), text: "Связь"),
+          Tab(icon: Icon(Icons.forum_outlined), text: "Форум"),
+        ],
+      ),
+      centerTitle: true,
+      actions: [
+        IconButton(
+          tooltip: "Поиск людей",
+          icon: const Icon(Icons.person),
+          onPressed: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SearchUsersPage()),
+            );
+            _loadChats(); // обновляем после поиска
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChatsTab() {
+    if (chatUsers.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text("У вас пока нет диалогов"),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.person),
+              label: const Text("Найти людей"),
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const SearchUsersPage()),
+                );
+                _loadChats();
+              },
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      itemCount: chatUsers.length,
+      itemBuilder: (context, index) {
+        final user = chatUsers[index];
+        final lastMsg = lastMessages[user.email];
+
+        return ListTile(
+          leading: CircleAvatar(
+            child: Text(
+              user.nickname?.isNotEmpty == true
+                  ? user.nickname![0].toUpperCase()
+                  : "?",
+            ),
+          ),
+          title: Text(user.nickname ?? "Без имени"),
+          subtitle: Text(
+            lastMsg?.text ?? "Нет сообщений",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          onTap: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => ChatPage(otherUser: user)),
+            );
+            _loadChats(); // обновляем список после возврата
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -34,71 +148,12 @@ class _CommunitiesPageState extends State<CommunitiesPage> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(kToolbarHeight),
-          child: AppBar(
-            automaticallyImplyLeading: false,
-            backgroundColor: const Color(0xFF121212),
-            elevation: 0,
-            title: const TabBar(
-              tabs: [
-                Tab(icon: Icon(Icons.chat_bubble_outline), text: "Чаты"),
-                Tab(icon: Icon(Icons.forum_outlined), text: "Форум"),
-              ],
-            ),
-            centerTitle: true,
-          ),
-        ),
+        appBar: _buildTopBar(),
         body: TabBarView(
           children: [
-            // 👇 Вкладка "Чаты"
-            ListView.builder(
-              itemCount: chatUsers.length,
-              itemBuilder: (context, index) {
-                final user = chatUsers[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    child: Text(
-                      user.nickname?.isNotEmpty == true
-                          ? user.nickname![0].toUpperCase()
-                          : "?",
-                    ),
-                  ),
-                  title: Text(user.nickname ?? "Без имени"),
-                  subtitle: const Text("Привет! Это тестовое сообщение 👋"),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ChatPage(otherUser: user),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
-
-            // 👇 Вкладка "Форум" — теперь подключаем твой ForumTab
+            _buildChatsTab(),
             const ForumTab(),
           ],
-        ),
-
-
-        floatingActionButton: FloatingActionButton(
-          heroTag: "communitiesFab", // 👈 уникальный тег
-          onPressed: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Нажата кнопка связи")),
-            );
-          },
-          child: const Icon(Icons.hub),
-        ),
-
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: BottomAppBar(
-          shape: const CircularNotchedRectangle(),
-          notchMargin: 6,
-          child: const SizedBox(height: 50),
         ),
       ),
     );

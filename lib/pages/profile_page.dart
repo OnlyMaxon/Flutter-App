@@ -23,7 +23,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> _loadUser() async {
-    final data = await loadCurrentUser(); // 👈 заменили
+    final data = await loadCurrentUser();
     if (data != null && data.photoPath != null && File(data.photoPath!).existsSync()) {
       final dominant = await _getDominantColor(data.photoPath!);
       setState(() {
@@ -34,7 +34,6 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() => _user = data);
     }
   }
-
 
   Future<Color> _getDominantColor(String imagePath) async {
     final palette = await PaletteGenerator.fromImageProvider(
@@ -70,7 +69,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 )
                     : BoxDecoration(
-                  color: _coverColor, // по умолчанию цвет из аватарки
+                  color: _coverColor,
                 ),
               ),
 
@@ -85,7 +84,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       context,
                       MaterialPageRoute(builder: (_) => const EditProfilePage()),
                     );
-                    _loadUser(); // обновляем данные после возврата
+                    _loadUser();
                   },
                 ),
               ),
@@ -137,7 +136,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 const SizedBox(height: 8),
 
-                // Бейдж Student
                 if (_user!.isStudent == true)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -205,7 +203,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                   ],
                 ),
-
               ],
             ),
           ),
@@ -276,61 +273,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
           const SizedBox(height: 16),
 
-          // Followers / Following
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Column(children: const [
-                Text('122',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                Text('Followers', style: TextStyle(color: Colors.grey)),
-              ]),
-              Column(children: const [
-                Text('67',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                Text('Following', style: TextStyle(color: Colors.grey)),
-              ]),
-            ],
-          ),
-
-          const SizedBox(height: 16),
-
-          // Кнопки действий (без Edit)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    side: const BorderSide(color: Colors.white),
-                  ),
-                  child: const Text('Text'),
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                  ),
-                  child: const Text('Subscribe'),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
           // Плейсхолдер контента
           Center(
             child: Column(
               children: const [
-                Icon(Icons.image_not_supported,
-                    size: 64, color: Colors.grey),
+                Icon(Icons.image_not_supported, size: 64, color: Colors.grey),
                 SizedBox(height: 8),
-                Text('Нет загруженного контента',
-                    style: TextStyle(color: Colors.grey)),
+                Text('Нет загруженного контента', style: TextStyle(color: Colors.grey)),
               ],
             ),
           ),

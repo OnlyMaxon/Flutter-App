@@ -1,10 +1,9 @@
-﻿
-// ЕСТЬ ЗАГЛУШКИ !!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'forum_chat_page.dart';
 import 'package:apps/pages/registration/registration_data.dart';
 import 'package:apps/services/user_storage.dart';
+import 'package:apps/services/message_storage.dart';
+import 'package:apps/services/message.dart';
 
 class ForumTab extends StatefulWidget {
   const ForumTab({super.key});
@@ -15,39 +14,37 @@ class ForumTab extends StatefulWidget {
 
 class _ForumTabState extends State<ForumTab> {
   List<UserRegistrationData> users = [];
+  List<Message> forumMessages = [];
   bool loading = true;
+
+  final MessageStorage _messageStorage = MessageStorage();
 
   @override
   void initState() {
     super.initState();
-    _loadUsers();
+    _loadData();
   }
 
-  Future<void> _loadUsers() async {
-    final loaded = await loadUsers();
+  Future<void> _loadData() async {
+    final loadedUsers = await loadUsers();
+    final msgs = await _messageStorage.loadMessages();
+
+    // берём только форумные сообщения (у которых есть topic)
+    final forumMsgs = msgs.where((m) => m.topic != null && m.topic!.isNotEmpty).toList();
+
     setState(() {
-      users = loaded;
+      users = loadedUsers;
+      forumMessages = forumMsgs;
       loading = false;
     });
   }
 
-  UserRegistrationData _findAuthor(String nickname) {
-    return users.firstWhere(
-          (u) => u.nickname == nickname,
-      orElse: () => UserRegistrationData(
-        email: "unknown@example.com",
-        password: "",
-        firstName: "Unknown",
-        lastName: "",
-        nickname: "Unknown",
-        country: "",
-        nationality: "",
-        languages: [],
-        interests: [],
-        isStudent: false,
-        isLoggedIn: false,
-      ),
-    );
+  UserRegistrationData? _findAuthor(String email) {
+    try {
+      return users.firstWhere((u) => u.email == email);
+    } catch (_) {
+      return null;
+    }
   }
 
   @override
@@ -56,46 +53,51 @@ class _ForumTabState extends State<ForumTab> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    // 👇 демо-посты, теперь автор ищется безопасно
-    final forumPosts = [
-      {
-        "author": _findAuthor("Maxon"), // например твой тестовый ник
-        "question": "Где купить магнитные наклейки?",
-        "tag": "#taxi@Vistula",
-      },
-      {
-        "author": _findAuthor("Maxon"),
-        "question": "Кто идёт на встречу в субботу?",
-        "tag": "#meetup",
-      },
-    ];
+    if (forumMessages.isEmpty) {
+      return const Center(child: Text("Нет тем на форуме"));
+    }
+
+    // группируем сообщения по topic → берём последнее сообщение как превью
+    final Map<String, Message> lastByTopic = {};
+    for (final msg in forumMessages) {
+      if (!lastByTopic.containsKey(msg.topic!) ||
+          msg.timestamp.isAfter(lastByTopic[msg.topic!]!.timestamp)) {
+        lastByTopic[msg.topic!] = msg;
+      }
+    }
+
+    final topics = lastByTopic.values.toList()
+      ..sort((a, b) => b.timestamp.compareTo(a.timestamp));
 
     return ListView.builder(
-      itemCount: forumPosts.length,
+      itemCount: topics.length,
       itemBuilder: (context, index) {
-        final post = forumPosts[index];
-        final author = post["author"] as UserRegistrationData;
+        final msg = topics[index];
+        final author = _findAuthor(msg.sender);
 
         return Card(
           margin: const EdgeInsets.all(8),
           child: ListTile(
             leading: CircleAvatar(
               child: Text(
-                author.nickname?.isNotEmpty == true
-                    ? author.nickname![0].toUpperCase()
-                    : "?",
+                (author?.nickname?.isNotEmpty == true
+                    ? author!.nickname![0].toUpperCase()
+                    : "?"),
               ),
             ),
-            title: Text("${author.nickname}, ${post["tag"]}"),
-            subtitle: Text(post["question"] as String),
+            title: Text(msg.topic ?? "Без темы"),
+            subtitle: Text(
+              msg.text,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
             trailing: ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (_) => ForumChatPage(
-                      topic: post["question"] as String,
-                      author: author.nickname ?? "Без имени",
+                      topic: msg.topic ?? "Без темы",
                     ),
                   ),
                 );

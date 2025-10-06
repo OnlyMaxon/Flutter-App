@@ -1,17 +1,14 @@
-﻿
-//ЕСТЬ ЗАГЛУШКА !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'profile_pagedemo.dart';
 import 'package:apps/pages/registration/registration_data.dart';
 import 'package:apps/services/user_storage.dart';
-import 'package:apps/services/message_storage.dart'; // 👈 хранилище сообщений
+import 'package:apps/services/message_storage.dart'; // хранилище сообщений
+import 'package:apps/services/message.dart'; // модель сообщения
 
 class ForumChatPage extends StatefulWidget {
   final String topic;
-  final String author; // сюда приходит nickname автора
 
-  const ForumChatPage({super.key, required this.topic, required this.author});
+  const ForumChatPage({super.key, required this.topic});
 
   @override
   State<ForumChatPage> createState() => _ForumChatPageState();
@@ -22,6 +19,8 @@ class _ForumChatPageState extends State<ForumChatPage> {
   final MessageStorage _messageStorage = MessageStorage();
 
   List<Message> _messages = [];
+  List<UserRegistrationData> _users = [];
+  UserRegistrationData? _currentUser;
   bool loading = true;
 
   @override
@@ -32,22 +31,23 @@ class _ForumChatPageState extends State<ForumChatPage> {
 
   Future<void> _loadMessages() async {
     final msgs = await _messageStorage.loadMessages();
+    final users = await loadUsers();
+    final current = await loadCurrentUser();
+
     setState(() {
-      // фильтруем сообщения по теме форума
       _messages = msgs.where((m) => m.topic == widget.topic).toList();
+      _users = users;
+      _currentUser = current;
       loading = false;
     });
   }
 
   Future<void> _sendMessage() async {
-    if (_controller.text.trim().isEmpty) return;
-
-    // 👇 загружаем текущего пользователя
-    UserRegistrationData? currentUser = await loadCurrentUser();
-    if (currentUser == null) return;
+    if (_controller.text.trim().isEmpty || _currentUser == null) return;
 
     final newMsg = Message(
-      authorEmail: currentUser.email,
+      sender: _currentUser!.email,
+      recipient: "", // форумное сообщение — не личное
       text: _controller.text.trim(),
       timestamp: DateTime.now(),
       topic: widget.topic,
@@ -61,27 +61,19 @@ class _ForumChatPageState extends State<ForumChatPage> {
     });
   }
 
-  Future<void> _openAuthorProfile() async {
-    final users = await loadUsers();
-    final authorUser = users.firstWhere(
-          (u) => u.nickname == widget.author,
-      orElse: () => UserRegistrationData(
-        email: "-",
-        password: "-",              // 👈 обязательное поле
-        nickname: widget.author,
-        firstName: widget.author,
-        lastName: "",
-        country: "-",
-        nationality: "-",
-      ),
+  UserRegistrationData? _findUserByEmail(String email) {
+    try {
+      return _users.firstWhere((u) => u.email == email);
+    } catch (_) {
+      return null;
+    }
+  }
 
-    );
-
-    if (!mounted) return;
+  void _openAuthorProfile(UserRegistrationData user) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ProfilePageDemo(user: authorUser),
+        builder: (_) => ProfilePageDemo(user: user),
       ),
     );
   }
@@ -97,60 +89,35 @@ class _ForumChatPageState extends State<ForumChatPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.topic),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.person),
-            tooltip: "Профиль автора",
-            onPressed: _openAuthorProfile,
-          ),
-        ],
       ),
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
+            child: _messages.isEmpty
+                ? const Center(child: Text("Нет сообщений в этой теме"))
+                : ListView.builder(
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final msg = _messages[index];
-                final userEmail = msg.authorEmail;
+                final author = _findUserByEmail(msg.sender);
 
-                return FutureBuilder<List<UserRegistrationData>>(
-                  future: loadUsers(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return const ListTile(title: Text("Загрузка..."));
-                    }
-                    final users = snapshot.data!;
-                    final author = users.firstWhere(
-                          (u) => u.email == userEmail,
-                      orElse: () => UserRegistrationData(
-                        email: userEmail,
-                        password: "-",              // 👈 обязательное поле
-                        nickname: "Unknown",
-                        firstName: "Unknown",
-                        lastName: "",
-                        country: "-",
-                        nationality: "-",
-                      ),
-
-                    );
-
-                    return ListTile(
-                      leading: CircleAvatar(
-                        child: Text(
-                          author.nickname?.isNotEmpty == true
-                              ? author.nickname![0].toUpperCase()
-                              : "?",
-                        ),
-                      ),
-                      title: Text(author.nickname ?? "Unknown"),
-                      subtitle: Text(msg.text, softWrap: true),
-                      trailing: Text(
-                        "${msg.timestamp.hour}:${msg.timestamp.minute.toString().padLeft(2, '0')}",
-                        style: const TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                    );
-                  },
+                return ListTile(
+                  leading: CircleAvatar(
+                    child: Text(
+                      (author?.nickname?.isNotEmpty == true
+                          ? author!.nickname![0].toUpperCase()
+                          : "?"),
+                    ),
+                  ),
+                  title: Text(author?.nickname ?? msg.sender),
+                  subtitle: Text(msg.text, softWrap: true),
+                  trailing: Text(
+                    "${msg.timestamp.hour}:${msg.timestamp.minute.toString().padLeft(2, '0')}",
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                  onTap: author != null
+                      ? () => _openAuthorProfile(author)
+                      : null,
                 );
               },
             ),

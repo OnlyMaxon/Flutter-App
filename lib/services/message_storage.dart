@@ -1,34 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-
-class Message {
-  final String authorEmail;
-  final String text;
-  final DateTime timestamp;
-  final String topic; // 👈 добавляем тему, чтобы фильтровать по форумам/чатам
-
-  Message({
-    required this.authorEmail,
-    required this.text,
-    required this.timestamp,
-    required this.topic,
-  });
-
-  Map<String, dynamic> toJson() => {
-    'authorEmail': authorEmail,
-    'text': text,
-    'timestamp': timestamp.toIso8601String(),
-    'topic': topic,
-  };
-
-  factory Message.fromJson(Map<String, dynamic> json) => Message(
-    authorEmail: json['authorEmail'],
-    text: json['text'],
-    timestamp: DateTime.parse(json['timestamp']),
-    topic: json['topic'] ?? "", // fallback для старых данных
-  );
-}
+import '../services/message.dart'; // 👈 теперь импортируем модель из отдельного файла
 
 class MessageStorage {
   Future<File> _getMessagesFile() async {
