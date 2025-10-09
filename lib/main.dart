@@ -5,6 +5,8 @@ import 'pages/explore_page.dart';
 import 'pages/communities_page.dart';
 import 'pages/profile_page.dart';
 import 'pages/create_post_page.dart';
+import 'pages/create_forum_page.dart';
+import 'pages/create_choice_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,13 +21,18 @@ class MeetPlaceApp extends StatelessWidget {
     return MaterialApp(
       title: 'MeetPlace',
       theme: ThemeData.dark().copyWith(
-        scaffoldBackgroundColor: const Color(0xFF121212),
+        scaffoldBackgroundColor: const Color(0xFF0E0E0E),
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blueAccent,
           brightness: Brightness.dark,
         ),
       ),
       home: const StartupPage(),
+      routes: {
+        '/choice': (context) => const CreateChoicePage(),
+        '/forum': (context) => const CreateForumPage(),
+        '/post': (context) => const CreatePostPage(),
+      },
     );
   }
 }
@@ -50,7 +57,7 @@ class _StartupPageState extends State<StartupPage> {
   Future<void> _checkRegistration() async {
     final currentUser = await loadCurrentUser();
     _registered = currentUser != null &&
-        currentUser.email.isNotEmpty &&   // email теперь всегда required
+        currentUser.email.isNotEmpty &&
         currentUser.isLoggedIn;
     setState(() => _loading = false);
   }
@@ -203,14 +210,10 @@ class _MainPageState extends State<MainPage> {
       body: IndexedStack(index: _selectedIndex, children: _pages),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const CreatePostPage()),
-          );
+          Navigator.pushNamed(context, '/choice');
         },
         backgroundColor: Colors.blueAccent,
-        mini: true,
-        child: const Icon(Icons.add, size: 24),
+        child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(

@@ -1,21 +1,21 @@
-﻿import 'package:flutter/material.dart';
-import '../data/repositories/post_repository.dart';
+import 'package:flutter/material.dart';
+import '../data/repositories/forum_repository.dart';
 import '../services/user_storage.dart'; // ✅ используем твой user_storage
 
-class CreatePostPage extends StatefulWidget {
-  const CreatePostPage({super.key, this.forumId});
-  final String? forumId; // null => глобальный пост
+class CreateForumPage extends StatefulWidget {
+  const CreateForumPage({super.key});
 
   @override
-  State<CreatePostPage> createState() => _CreatePostPageState();
+  State<CreateForumPage> createState() => _CreateForumPageState();
 }
 
-class _CreatePostPageState extends State<CreatePostPage> {
+class _CreateForumPageState extends State<CreateForumPage> {
   final _title = TextEditingController();
-  final _content = TextEditingController();
+  final _desc = TextEditingController();
+  final _tags = TextEditingController();
   bool _loading = false;
 
-  final _posts = PostRepository();
+  final _forums = ForumRepository();
 
   Future<void> _submit() async {
     setState(() => _loading = true);
@@ -24,17 +24,23 @@ class _CreatePostPageState extends State<CreatePostPage> {
       final user = await loadCurrentUser();
       if (user == null) throw StateError('Пользователь не авторизован');
 
-      await _posts.create(
+      final tags = _tags.text
+          .split(',')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+
+      // ✅ ownerId = email (или можно user.id, если он есть в UserRegistrationData)
+      await _forums.create(
         title: _title.text,
-        content: _content.text,
-        // 👇 В качестве идентификатора автора используем email (или id, если есть в UserRegistrationData)
-        authorId: user.email,
-        forumId: widget.forumId,
+        description: _desc.text,
+        ownerId: user.email, // 👈 ключевая связь
+        tags: tags,
       );
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Пост опубликован')),
+        const SnackBar(content: Text('Форум создан')),
       );
       Navigator.pop(context);
     } catch (e) {
@@ -49,27 +55,33 @@ class _CreatePostPageState extends State<CreatePostPage> {
   @override
   void dispose() {
     _title.dispose();
-    _content.dispose();
+    _desc.dispose();
+    _tags.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Создать пост')),
+      appBar: AppBar(title: const Text('Создать форум')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             TextField(
               controller: _title,
-              decoration: const InputDecoration(labelText: 'Заголовок'),
+              decoration: const InputDecoration(labelText: 'Название'),
             ),
             const SizedBox(height: 12),
             TextField(
-              controller: _content,
-              maxLines: 5,
-              decoration: const InputDecoration(labelText: 'Содержание'),
+              controller: _desc,
+              maxLines: 3,
+              decoration: const InputDecoration(labelText: 'Описание'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _tags,
+              decoration: const InputDecoration(labelText: 'Теги (через запятую)'),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -80,7 +92,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 width: 20,
                 child: CircularProgressIndicator(strokeWidth: 2),
               )
-                  : const Text('Опубликовать'),
+                  : const Text('Создать'),
             ),
           ],
         ),

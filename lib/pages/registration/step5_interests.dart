@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:apps/services/registration_draft.dart'; // 👈 теперь используем draft
+import 'package:apps/services/registration_draft.dart';
 
 class Step5Interests extends StatefulWidget {
   final RegistrationDraft draft;
@@ -25,7 +25,6 @@ class _Step5InterestsState extends State<Step5Interests> {
   @override
   void initState() {
     super.initState();
-    // 👇 подтягиваем интересы из draft
     selected = [...widget.draft.interests];
   }
 
@@ -52,52 +51,116 @@ class _Step5InterestsState extends State<Step5Interests> {
   @override
   Widget build(BuildContext context) {
     final display = {...base, ...selected}.toList();
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: display.map((t) {
-              final act = selected.contains(t);
-              return ChoiceChip(
-                label: Text(t),
-                selected: act,
-                onSelected: (_) => toggle(t),
-              );
-            }).toList(),
-          ),
-          const SizedBox(height: 12),
-          Row(
+    return Scaffold(
+      backgroundColor: const Color(0xFF0E0E0E),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: TextField(
-                  controller: customCtrl,
-                  decoration: const InputDecoration(hintText: 'Добавить интерес'),
+              const Text(
+                'Выберите интересы',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
-              const SizedBox(width: 8),
-              ElevatedButton(onPressed: addCustom, child: const Text('Добавить')),
-            ],
-          ),
-          const Spacer(),
-          Row(
-            children: [
-              TextButton(onPressed: widget.onBack, child: const Text('Назад')),
+              const SizedBox(height: 24),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: display.map((t) {
+                  final act = selected.contains(t);
+                  return ChoiceChip(
+                    label: Text(
+                      t,
+                      style: TextStyle(
+                        color: act ? Colors.white : Colors.grey,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    selected: act,
+                    selectedColor: const Color(0xFF1E88E5),
+                    backgroundColor: const Color(0xFF1A1A1A),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    onSelected: (_) => toggle(t),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: customCtrl,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Добавить интерес',
+                        hintStyle: const TextStyle(color: Colors.grey),
+                        filled: true,
+                        fillColor: const Color(0xFF1A1A1A),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1E88E5),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: addCustom,
+                    child: const Text(
+                      'Добавить',
+                      style: TextStyle(fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
               const Spacer(),
-              ElevatedButton(
-                onPressed: () {
-                  // 👇 сохраняем выбранные интересы в draft
-                  widget.draft.interests = selected;
-                  widget.onNext();
-                },
-                child: const Text('Далее'),
+              Row(
+                children: [
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.grey,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                    onPressed: widget.onBack,
+                    child: const Text('Назад'),
+                  ),
+                  const Spacer(),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1E88E5),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      widget.draft.interests = selected;
+                      widget.onNext();
+                    },
+                    child: const Text(
+                      'Далее',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

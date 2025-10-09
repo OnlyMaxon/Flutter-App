@@ -2,10 +2,13 @@
 import 'package:apps/services/user_storage.dart';
 import 'chat_page.dart';
 import 'package:apps/pages/registration/registration_data.dart';
-import 'forum_tab.dart';
 import '../services/message_storage.dart';
 import '../services/message.dart';
-import 'search_users_page.dart'; // 👈 подключаем поиск
+import 'search_users_page.dart';
+import '../data/models/forum.dart';
+import '../data/repositories/forum_repository.dart';
+import 'forum_chat_page.dart';
+import 'create_choice_page.dart';
 
 class CommunitiesPage extends StatefulWidget {
   const CommunitiesPage({super.key});
@@ -15,15 +18,21 @@ class CommunitiesPage extends StatefulWidget {
 }
 
 class _CommunitiesPageState extends State<CommunitiesPage> {
+  // --- Чаты ---
   List<UserRegistrationData> chatUsers = [];
   Map<String, Message> lastMessages = {}; // email -> последнее сообщение
   UserRegistrationData? _currentUser;
   final MessageStorage _storage = MessageStorage();
 
+  // --- Форумы ---
+  final _forumsRepo = ForumRepository();
+  List<Forum> _forums = [];
+
   @override
   void initState() {
     super.initState();
     _loadChats();
+    _loadForums();
   }
 
   Future<void> _loadChats() async {
@@ -37,13 +46,11 @@ class _CommunitiesPageState extends State<CommunitiesPage> {
       for (final u in users) {
         if (u.email == current.email) continue;
 
-        // фильтруем все сообщения между current и этим пользователем
         final msgs = allMessages.where((m) =>
         (m.sender == current.email && m.recipient == u.email) ||
             (m.sender == u.email && m.recipient == current.email));
 
         if (msgs.isNotEmpty) {
-          // берём последнее по времени
           final last = msgs.reduce((a, b) =>
           a.timestamp.isAfter(b.timestamp) ? a : b);
           latest[u.email] = last;
@@ -53,10 +60,14 @@ class _CommunitiesPageState extends State<CommunitiesPage> {
 
     setState(() {
       _currentUser = current;
-      // 👇 теперь только те пользователи, с кем реально есть сообщения
       chatUsers = users.where((u) => latest.containsKey(u.email)).toList();
       lastMessages = latest;
     });
+  }
+
+  Future<void> _loadForums() async {
+    final list = await _forumsRepo.list();
+    setState(() => _forums = list);
   }
 
   PreferredSizeWidget _buildTopBar() {
@@ -80,7 +91,7 @@ class _CommunitiesPageState extends State<CommunitiesPage> {
               context,
               MaterialPageRoute(builder: (_) => const SearchUsersPage()),
             );
-            _loadChats(); // обновляем после поиска
+            _loadChats();
           },
         ),
       ],
@@ -136,10 +147,44 @@ class _CommunitiesPageState extends State<CommunitiesPage> {
               context,
               MaterialPageRoute(builder: (_) => ChatPage(otherUser: user)),
             );
-            _loadChats(); // обновляем список после возврата
+            _loadChats();
           },
         );
       },
+    );
+  }
+
+  Widget _buildForumsTab() {
+    if (_forums.isEmpty) {
+      return const Center(child: Text("Форумов пока нет"));
+    }
+
+    return RefreshIndicator(
+      onRefresh: _loadForums,
+      child: ListView.separated(
+        itemCount: _forums.length,
+        separatorBuilder: (_, __) => const Divider(height: 1),
+        itemBuilder: (context, i) {
+          final f = _forums[i];
+          return ListTile(
+            leading: const Icon(Icons.forum_outlined),
+            title: Text(f.title),
+            subtitle: Text(f.description ?? ''),
+            onTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => ForumChatPage(
+                    forumId: f.id,
+                    forumTitle: f.title,
+                  ),
+                ),
+              );
+              _loadForums();
+            },
+          );
+        },
+      ),
     );
   }
 
@@ -152,8 +197,18 @@ class _CommunitiesPageState extends State<CommunitiesPage> {
         body: TabBarView(
           children: [
             _buildChatsTab(),
-            const ForumTab(),
+            _buildForumsTab(),
           ],
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () async {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CreateChoicePage()),
+            );
+            _loadForums();
+          },
+          child: const Icon(Icons.add),
         ),
       ),
     );

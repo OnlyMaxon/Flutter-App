@@ -1,7 +1,7 @@
 ﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:apps/services/registration_draft.dart'; // 👈 теперь используем draft
+import 'package:apps/services/registration_draft.dart';
 
 class Step2Photo extends StatefulWidget {
   final RegistrationDraft draft;
@@ -30,7 +30,7 @@ class _Step2PhotoState extends State<Step2Photo> {
     );
     if (res != null) {
       setState(() => _file = File(res.path));
-      widget.draft.photoPath = res.path; // 👈 сохраняем в draft
+      widget.draft.photoPath = res.path;
     }
   }
 
@@ -44,36 +44,77 @@ class _Step2PhotoState extends State<Step2Photo> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 60,
-            backgroundImage: _file != null ? FileImage(_file!) : null,
-            child: _file == null ? const Icon(Icons.person, size: 48) : null,
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: _pick,
-            icon: const Icon(Icons.photo),
-            label: const Text('Добавить фото'),
-          ),
-          const Spacer(),
-          Row(
+    return Scaffold(
+      backgroundColor: const Color(0xFF0E0E0E),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
             children: [
-              TextButton(
-                onPressed: widget.onSkip,
-                child: const Text('Пропустить'),
+              const Text(
+                'Добавьте фото профиля',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 32),
+              CircleAvatar(
+                radius: 60,
+                backgroundColor: const Color(0xFF1A1A1A),
+                backgroundImage: _file != null ? FileImage(_file!) : null,
+                child: _file == null
+                    ? const Icon(Icons.person, size: 48, color: Colors.grey)
+                    : null,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF1E88E5),
+                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: _pick,
+                icon: const Icon(Icons.photo, color: Colors.white),
+                label: const Text(
+                  'Добавить фото',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                ),
               ),
               const Spacer(),
-              ElevatedButton(
-                onPressed: widget.onNext,
-                child: const Text('Далее'),
+              Row(
+                children: [
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.grey,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                    onPressed: widget.onSkip,
+                    child: const Text('Пропустить'),
+                  ),
+                  const Spacer(),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1E88E5),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: widget.onNext,
+                    child: const Text(
+                      'Далее',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

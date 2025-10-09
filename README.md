@@ -1,4 +1,4 @@
-# apps
+# MeetPlace
 
 Flutter(MeetPlace)
 

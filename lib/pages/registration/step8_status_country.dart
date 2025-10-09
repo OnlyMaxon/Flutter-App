@@ -1,7 +1,7 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:apps/services/registration_draft.dart'; // 👈 теперь используем draft
+import 'package:apps/services/registration_draft.dart';
 
 class Step8StatusCountry extends StatefulWidget {
   final RegistrationDraft draft;
@@ -82,7 +82,7 @@ class _Step8StatusCountryState extends State<Step8StatusCountry> {
       if (!mounted) return;
       setState(() {
         selectedCountry = c;
-        widget.draft.country = c; // 👈 сохраняем в draft
+        widget.draft.country = c;
       });
     } catch (e) {
       if (!mounted) return;
@@ -95,55 +95,104 @@ class _Step8StatusCountryState extends State<Step8StatusCountry> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        children: [
-          DropdownButtonFormField<String>(
-            value: selectedCountry,
-            decoration: const InputDecoration(labelText: 'Страна'),
-            items: countries
-                .map((country) => DropdownMenuItem(
-              value: country,
-              child: Text(country),
-            ))
-                .toList(),
-            onChanged: (value) {
-              setState(() {
-                selectedCountry = value;
-                widget.draft.country = value; // 👈 сохраняем в draft
-              });
-            },
-          ),
-          if (_loading)
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: CircularProgressIndicator(),
-            ),
-          if (_error != null) ...[
-            const SizedBox(height: 8),
-            Text(
-              _error!,
-              style: const TextStyle(color: Colors.red, fontSize: 12),
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              onPressed: _autoFillCountry,
-              child: const Text("Повторить определение страны"),
-            ),
-          ],
-          const Spacer(),
-          Row(
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextButton(onPressed: widget.onBack, child: const Text('Назад')),
+              const Text(
+                'Выберите страну проживания',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 24),
+              DropdownButtonFormField<String>(
+                value: selectedCountry,
+                dropdownColor: const Color(0xFF1A1A1A),
+                style: const TextStyle(color: Colors.white),
+                decoration: InputDecoration(
+                  labelText: 'Страна',
+                  labelStyle: const TextStyle(color: Colors.grey),
+                  filled: true,
+                  fillColor: const Color(0xFF1A1A1A),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                items: countries
+                    .map((country) => DropdownMenuItem(
+                  value: country,
+                  child: Text(country, style: const TextStyle(color: Colors.white)),
+                ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedCountry = value;
+                    widget.draft.country = value;
+                  });
+                },
+              ),
+              if (_loading)
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: CircularProgressIndicator(color: Colors.white),
+                ),
+              if (_error != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  _error!,
+                  style: const TextStyle(color: Colors.red, fontSize: 12),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1E88E5),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: _autoFillCountry,
+                  child: const Text('Повторить определение страны'),
+                ),
+              ],
               const Spacer(),
-              ElevatedButton(
-                onPressed: selectedCountry == null ? null : widget.onNext,
-                child: const Text('Завершить'),
+              Row(
+                children: [
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.grey,
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                    onPressed: widget.onBack,
+                    child: const Text('Назад'),
+                  ),
+                  const Spacer(),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1E88E5),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: selectedCountry == null ? null : widget.onNext,
+                    child: const Text(
+                      'Завершить',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
