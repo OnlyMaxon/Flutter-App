@@ -140,9 +140,9 @@ class _MainPageState extends State<MainPage> {
                       Future.delayed(Duration.zero, () {
                         showAboutDialog(
                           context: context,
-                          applicationName: "MeetPlace",
+                          applicationName: "DemoApp",
                           applicationVersion: "5.0.0",
-                          applicationLegalese: "© 2025 MeetPlace",
+                          applicationLegalese: "© 2025 Jalil Orujli",
                         );
                       });
                     },

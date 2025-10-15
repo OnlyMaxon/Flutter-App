@@ -1,7 +1,6 @@
-# MeetPlace
+# Demo App of my Startup
 
-Flutter(MeetPlace)
-
+Demo App with Flutter . Owner is Jalil Orujli 
 ## Getting Started
 
 This project is a starting point for a Flutter application.

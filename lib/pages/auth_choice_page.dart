@@ -22,7 +22,7 @@ class AuthChoicePage extends StatelessWidget {
               ),
               const SizedBox(height: 40),
               const Text(
-                'Добро пожаловать в MeetPlace',
+                'Добро пожаловать',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
