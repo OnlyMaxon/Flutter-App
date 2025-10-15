@@ -1,6 +1,6 @@
 # MeetPlace App 
 
-MeetPlace App with Flutter . Owner is Jalil Orujli 
+MeetPlace App with Flutter . Jalil Orujli
 
 ## Getting Started
 
