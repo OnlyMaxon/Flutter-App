@@ -1,4 +1,4 @@
-# MeetPlace App of my Startup
+# MeetPlace App 
 
 MeetPlace App with Flutter . Owner is Jalil Orujli 
 
