@@ -70,7 +70,7 @@ flutter_icons:
 flutter:
   assets:
     - assets/icon.png
-    - assets/app_flutter.png
+    - assets/app_flutter.png.png
     - assets/illustrations/forum_choice.png
     - assets/illustrations/post_choice.png
 

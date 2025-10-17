@@ -16,7 +16,7 @@ class AuthChoicePage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Image.asset(
-                "assets/app_flutter.png",
+                "assets/app_flutter.png.png",
                 width: 180,
                 fit: BoxFit.contain,
               ),
