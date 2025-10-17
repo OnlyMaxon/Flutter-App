@@ -10,16 +10,16 @@ import 'pages/create_choice_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MeetPlaceApp());
+  runApp(const AppFlutter());
 }
 
-class MeetPlaceApp extends StatelessWidget {
-  const MeetPlaceApp({super.key});
+class AppFlutter extends StatelessWidget {
+  const AppFlutter({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MeetPlace',
+      title: 'App Flutter',
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: const Color(0xFF0E0E0E),
         colorScheme: ColorScheme.fromSeed(
@@ -140,9 +140,9 @@ class _MainPageState extends State<MainPage> {
                       Future.delayed(Duration.zero, () {
                         showAboutDialog(
                           context: context,
-                          applicationName: "MeetPlace",
+                          applicationName: "App Flutter",
                           applicationVersion: "5.0.0",
-                          applicationLegalese: "© 2025 Jalil Orujli",
+                          applicationLegalese: "© 2025",
                         );
                       });
                     },

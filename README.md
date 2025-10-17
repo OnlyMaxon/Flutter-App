@@ -1,6 +1,6 @@
-# MeetPlace App 
+# App Flutter
 
-MeetPlace App with Flutter . Jalil Orujli
+Simple Flutter app skeleton for portfolio/demo purposes.
 
 ## Getting Started
 
